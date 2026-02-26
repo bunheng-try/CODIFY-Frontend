@@ -8,6 +8,7 @@ export type Classroom = {
 export type Assignment = {
   id: string;
   classroomId: string;
+  sectionId: string;
   title: string;
   isPublished:boolean,
   dueAt?: string;

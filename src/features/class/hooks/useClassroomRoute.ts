@@ -4,7 +4,7 @@ export function useClassroomRoute() {
   const { classId, assignmentId } = useParams()
 
   return {
-    classroomId: classId ?? null,
-    assignmentId: assignmentId ?? null,
+    classroomId: Number(classId) ?? null,
+    assignmentId: Number(assignmentId) ?? null,
   }
 }
