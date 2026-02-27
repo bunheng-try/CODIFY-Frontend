@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import MainPanel from "@/shared/components/layout/MainPanel";
+import MainPanel from "@/shared/components/layout/mainPanel/MainPanel";
 import AssignmentHeader from "../components/AssignmentHeader";
 import ChallengeTab from "../components/ChallengesTab";
 import { SettingsTab } from "../components/SettingsTab";

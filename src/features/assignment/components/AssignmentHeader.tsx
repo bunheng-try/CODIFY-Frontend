@@ -5,7 +5,7 @@ import { CodeIcon, MoreVerticalIcon, PencilIcon, SettingsIcon, UsersIcon } from 
 import { usePublishAssignment } from "../hooks/useAssignmentQuery";
 import type { Assignment } from "../apis/assignment.api";
 import type { JSX } from "react";
-import { BasePanelHeader } from "@/shared/components/layout/BasePanelHeader";
+import { BasePanelHeader } from "@/shared/components/layout/mainPanel/BasePanelHeader";
 
 type Props = {
   classroomId: number
