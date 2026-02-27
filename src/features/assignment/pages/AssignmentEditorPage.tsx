@@ -5,15 +5,15 @@ import ChallengeTab from "../components/ChallengesTab";
 import { SettingsTab } from "../components/SettingsTab";
 import { SubmissionsTab } from "../components/SubmissionTab";
 import { useAssignmentTabs } from "../hooks/useMenuTabs";
-import type { Assignment } from "@/shared/types/types";
 import { useClassroomRoute } from "@/features/class/hooks/useClassroomRoute";
 import { useAssignment } from "../hooks/useAssignmentQuery";
 import {mockSubmissions } from "@/shared/types/types";
+import type { Assignment } from "../apis/assignment.api";
 
 const AssignmentEditor = () => {
   const { activeTab } = useAssignmentTabs();
-  const { assignmentId } = useClassroomRoute();
-  const { data: assignment, isLoading } = useAssignment(assignmentId || null);
+  const { classroomId, assignmentId } = useClassroomRoute();
+  const { data: assignment, isLoading } = useAssignment(classroomId || null, assignmentId || null);
 
   const [isEditing, setIsEditing] = useState(false);
 
@@ -37,7 +37,7 @@ const AssignmentEditor = () => {
 
   return (
     <MainPanel
-      header={<AssignmentHeader assignment={assignment} isEditing={isEditing} />}
+      header={<AssignmentHeader classroomId={classroomId} assignment={assignment} isEditing={isEditing} />}
       emptyState={<div className="p-6 text-gray-400">No content</div>}
     >
       <div className="flex-1 overflow-auto">

@@ -9,11 +9,11 @@ export function useClassroomActions() {
     const updateMutation = useUpdateClassroom()
     const { classId } = useParams()
 
-    const deleteClassroom = (id: string) => {
+    const deleteClassroom = (id: number) => {
         deleteMutation.mutate(id, {
             onSuccess: () => {
-                const remainingClasses = classrooms.filter(c => String(c.id) !== id)
-                if (id === classId) {
+                const remainingClasses = classrooms.filter(c => c.id !== id)
+                if (id === Number(classId)) {
                     if (remainingClasses.length > 0) {
                         navigate(`/classrooms/${remainingClasses[0].id}`)
                     } else {
@@ -27,7 +27,7 @@ export function useClassroomActions() {
         })
     }
 
-    const editClassroom = async (id: string, newName: string) => {
+    const editClassroom = async (id: number, newName: string) => {
         try {
             await updateMutation.mutateAsync({ id, data: { name: newName } });
         } catch (error) {

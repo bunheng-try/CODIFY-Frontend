@@ -1,11 +1,11 @@
-import {type Assignment } from "@/shared/types/types";
 import { useContextMenu } from "@/shared/components/context-menu/ContextMenuProvider";
 import type { ContextMenuItem } from "../context-menu/types";
 import {Code } from "lucide-react";
+import type { Assignment } from "@/features/assignment/apis/assignment.api";
 
 interface Props {
   assignment: Assignment;
-  onDelete: (id: string) => void;
+  onDelete: (id: number) => void;
   onClick: (assignment: Assignment) => void;
   isSelect?: boolean;
   totalStudent: number;
@@ -97,11 +97,11 @@ const AssignmentCard = ({
         <div className="w-20 flex items-center flex-col gap-2 text-sm capitalize text-gray-500">
         
         <button
-            className={`w-full rounded-full py-1 px-2 ${assignment.isPublished?'bg-green-50 text-green-600':'bg-white text-gray-800'}`}
+            className={`w-full rounded-full py-1 px-2 ${assignment.published?'bg-green-50 text-green-600':'bg-white text-gray-800'}`}
         >
-            {assignment.isPublished?"Published":"Draft"}
+            {assignment.published?"Published":"Draft"}
         </button>
-          {assignment.isPublished 
+          {assignment.published 
             ?`${10}/${totalStudent}`
             :"Inactive"
             }

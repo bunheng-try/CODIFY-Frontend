@@ -1,9 +1,9 @@
 import { Button } from "@/shared/components/ui/button";
 import { Textarea } from "@/shared/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/shared/components/ui/dialog";
-import type { Assignment } from "@/shared/types/types";
 import { CalendarIcon, ChevronDownIcon, ClockIcon, Edit, Save, StarIcon, Trash2, X } from "lucide-react";
 import { useAssignmentSettings } from "../hooks/useAssignmentSettings";
+import type { Assignment } from "../apis/assignment.api";
 
 interface SettingsTabProps {
   assignment: Assignment;
@@ -19,8 +19,8 @@ export const SettingsTab = ({ assignment, isEditing, onEditChange, onAssignmentU
     setDueDate,
     timeDue,
     setTimeDue,
-    points,
-    setPoints,
+    // points,
+    // setPoints,
     description,
     setDescription,
     showDeleteDialog,
@@ -66,7 +66,7 @@ export const SettingsTab = ({ assignment, isEditing, onEditChange, onAssignmentU
           </div>
           <div className="flex justify-between">
             <span className="text-gray-600">Status</span>
-            <span className="capitalize">{assignment.isPublished?"Published":"Not Publish"}</span>
+            <span className="capitalize">{assignment.published?"Published":"Not Publish"}</span>
           </div>
         </div>
 
@@ -155,8 +155,8 @@ export const SettingsTab = ({ assignment, isEditing, onEditChange, onAssignmentU
           <input
             type="number"
             min={0}
-            value={points}
-            onChange={(e) => setPoints(e.target.value)}
+            // value={points}
+            // onChange={(e) => setPoints(e.target.value)}
             className="w-full h-12 pl-12 pr-10 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <ChevronDownIcon className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />

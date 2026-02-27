@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Users } from "lucide-react"
-import type { Classroom } from "@/shared/types/types"
+import type { Classroom } from "../apis/classroom.api"
 import { CustomDialog } from "@/shared/components/design/dialog/CustomDialog"
 import { cn } from "@/lib/utils"
 
@@ -8,8 +8,8 @@ type AllClassesDialogProps = {
   open: boolean
   onClose: () => void
   classrooms: Classroom[]
-  selectedClassroomId?: string
-  onSelect: (id: string) => void
+  selectedClassroomId?: number
+  onSelect: (id: number) => void
 }
 
 export function AllClassesDialog({
@@ -50,12 +50,12 @@ export function AllClassesDialog({
           <div className="max-h-[420px] overflow-y-auto mt-2">
             {filteredClasses.length > 0 ? (
               filteredClasses.map((cls) => {
-                const isSelected = String(cls.id) === selectedClassroomId
+                const isSelected = cls.id === selectedClassroomId
                 return (
                   <button
                     key={cls.id}
                     onClick={() => {
-                      onSelect(String(cls.id))
+                      onSelect(cls.id)
                       onClose()
                     }}
                     className={cn(

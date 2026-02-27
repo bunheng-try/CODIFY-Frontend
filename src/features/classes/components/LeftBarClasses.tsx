@@ -9,9 +9,9 @@ import { AllClassesDialog } from "./AllClassesDialog"
 
 type Props = {
     classes: Classroom[]
-    selectedClassroomId: string | null
-    onDelete: (id: string) => void
-    onEdit: (id: string) => void
+    selectedClassroomId: number | null
+    onDelete: (id: number) => void
+    onEdit: (id: number) => void
 }
 
 const BUTTON_HEIGHT = 48
@@ -24,8 +24,8 @@ export function LeftBarClasses({ classes, selectedClassroomId, onDelete, onEdit 
     const [openAll, setOpenAll] = useState(false)
 
     const orderedClasses = [
-        ...classes.filter((c) => String(c.id) === selectedClassroomId),
-        ...classes.filter((c) => String(c.id) !== selectedClassroomId),
+        ...classes.filter((c) => c.id === selectedClassroomId),
+        ...classes.filter((c) => c.id !== selectedClassroomId),
     ]
 
     useEffect(() => {
@@ -48,14 +48,14 @@ export function LeftBarClasses({ classes, selectedClassroomId, onDelete, onEdit 
                         key={c.id}
                         icon={<Users className="h-5 w-5" />}
                         tooltip={c.name}
-                        active={String(c.id) === selectedClassroomId}
+                        active={c.id === selectedClassroomId}
                         onClick={() => navigate(`/classrooms/${c.id}`)}
                         onContextMenu={(e) => {
                             e.preventDefault()
                             openMenu({
                                 x: e.clientX,
                                 y: e.clientY,
-                                items: getClassroomContextMenu(String(c.id), {
+                                items: getClassroomContextMenu(c.id, {
                                     deleteClassroom: onDelete,
                                     editClassroom: onEdit,
                                 }),
@@ -79,7 +79,7 @@ export function LeftBarClasses({ classes, selectedClassroomId, onDelete, onEdit 
             <AllClassesDialog
                 open={openAll}
                 onClose={() => setOpenAll(false)}
-                classrooms={classes.map(c => ({ ...c, id: String(c.id) }))} // id as string
+                classrooms={classes.map(c => ({ ...c, id: c.id }))}
                 onSelect={(id) => navigate(`/classrooms/${id}`)}
             />
 
