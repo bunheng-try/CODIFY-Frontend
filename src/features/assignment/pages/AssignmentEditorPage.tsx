@@ -5,7 +5,7 @@ import ChallengeTab from "../components/ChallengesTab";
 import { SettingsTab } from "../components/SettingsTab";
 import { SubmissionsTab } from "../components/SubmissionTab";
 import { useAssignmentTabs } from "../hooks/useMenuTabs";
-import { useClassroomRoute } from "@/features/class/hooks/useClassroomRoute";
+import { useClassroomRoute } from "@/features/classes/hooks/useClassroomRoute";
 import { useAssignment } from "../hooks/useAssignmentQuery";
 import {mockSubmissions } from "@/shared/types/types";
 import type { Assignment } from "../apis/assignment.api";

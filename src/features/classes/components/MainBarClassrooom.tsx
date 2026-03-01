@@ -1,6 +1,6 @@
 
 import { MainBar } from "@/shared/components/layout/MainBar";
-import { useClassroomRoute } from "@/features/class/hooks/useClassroomRoute";
+import { useClassroomRoute } from "@/features/classes/hooks/useClassroomRoute";
 import { useAssignmentClassrooms, useCreateAssignment } from "@/features/assignment/hooks/useAssignmentQuery";
 import AssignmentCard from "@/shared/components/ui/assignmentCard";
 import { useSelectedClassroom } from "../hooks/useClassroom";

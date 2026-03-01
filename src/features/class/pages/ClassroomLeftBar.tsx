@@ -1,7 +1,7 @@
 import { GraduationCapIcon } from "lucide-react";
 import { ClassroomBadge } from "../components/ClassesBadge";
 import type { Classroom } from "../types/classroom";
-import { useClassroomLeftBar } from "../hooks/useClassesQuery";
+import { useClassroomLeftBar } from "../hooks/useMemberQuery";
 import { useNavigate } from "react-router-dom";
 
 
