@@ -1,31 +1,50 @@
 import { useState } from "react";
 import { useCreateAssignment } from "./useAssignmentQuery";
-import { useAssignmentUIStore } from "../stores/useAssignmentStore";
+// import { useAssignmentUIStore } from "../stores/useAssignmentStore";
+import type { CreateAssignmentDto } from "../apis/assignment.api";
 
-export const useCreateAssignmentForm = (classId : number) => {
+export const useCreateAssignmentForm = (classroomId: number) => {
   const [title, setTitle] = useState("");
-  const { mutate: createAssignment, isError, isPending: isLoading } = useCreateAssignment();
-  const { setCreateDialogOpen} = useAssignmentUIStore()
+  const [description, setDescription] = useState("");
 
-  console.log("update id:" , classId);
+  // const { setCreateDialogOpen } = useAssignmentUIStore();
+
+  const {
+    mutate: createAssignment,
+    isPending,
+    isError,
+  } = useCreateAssignment(classroomId);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title) return;
-    createAssignment({classId, title},
-      {
-        onSuccess: () => {
-          setTitle("");
-          setCreateDialogOpen(false);
-        }
-      }
-    );
+    if (!title.trim()) return;
+
+    const dto: CreateAssignmentDto = {
+      classroomId,
+      title,
+      description,
+      dueAt: new Date(
+        Date.now() + 24 * 60 * 60 * 1000
+      ).toISOString(),
+      position: 0,
+    };
+
+    createAssignment(dto, {
+      onSuccess: () => {
+        setTitle("");
+        setDescription("");
+        // setCreateDialogOpen(false);
+      },
+    });
   };
 
   return {
     title,
     setTitle,
+    description,
+    setDescription,
+    isLoading: isPending,
     isError,
-    isLoading,
     handleSubmit,
   };
 };

@@ -5,13 +5,12 @@ import { useNavigate } from "react-router-dom"
 import { LeftBarButton } from "./LeftBarButton"
 import { CreateClassDialog } from "@/features/classes/components/CreateClassDialog"
 import { useClassrooms } from "@/features/classes/hooks/useClassroom"
-import { useClassroomRoute } from "@/features/class/hooks/useClassroomRoute"
+import { useClassroomRoute } from "@/features/classes/hooks/useClassroomRoute"
 import { LeftBarClasses } from "@/features/classes/components/LeftBarClasses"
 import { useClassroomActions } from "@/features/classes/hooks/useClassroomAction"
 import { LeftBarClassesSkeleton } from "@/features/classes/components/LeftBarClassesSkeleton"
 import { LeftBarClassesError } from "@/features/classes/components/LeftBarClassesError"
 import { ConfirmDialog } from "@/shared/components/design/dialog"
-import { classrooms } from "@/shared/types/types"
 import { EditClassDialog } from "@/features/classes/components/EditClassDialog"
 
 export function LeftBar() {
@@ -21,22 +20,22 @@ export function LeftBar() {
   const [openCreate, setOpenCreate] = useState(false)
   const { createClassroom, deleteClassroom, editClassroom } = useClassroomActions();
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
-  const [classToDelete, setClassToDelete] = useState<string | null>(null)
+  const [classToDelete, setClassToDelete] = useState<number | null>(null)
 
   const [openEdit, setOpenEdit] = useState(false);
   const [selectedClass, setSelectedClass] = useState<{
-    id: string;
+    id: number;
     name: string;
   } | null>(null);
 
-  const handleEdit = (classroomId: string) => {
-    const cls = classrooms.find((c) => String(c.id) === classroomId);
+  const handleEdit = (classroomId: number) => {
+    const cls = classes.find((c) => c.id === classroomId);
     if (!cls) return;
     setSelectedClass({ id: classroomId, name: cls.name });
     setOpenEdit(true);
   };
 
-  const handleOpenDelete = (id: string) => {
+  const handleOpenDelete = (id: number) => {
     setClassToDelete(id)
     setConfirmDeleteOpen(true)
   }

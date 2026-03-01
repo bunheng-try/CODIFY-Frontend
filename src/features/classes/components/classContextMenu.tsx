@@ -2,10 +2,10 @@ import { Archive, Trash } from "lucide-react"
 import type { ContextMenuItem } from "@/shared/components/context-menu/types"
 
 export function getClassroomContextMenu(
-  classroomId: string,
+  classroomId: number,
   actions: {
-    editClassroom?: (id: string) => void
-    deleteClassroom?: (id: string) => void
+    editClassroom?: (id: number) => void
+    deleteClassroom?: (id: number) => void
   }
 ): ContextMenuItem[] {
   return [

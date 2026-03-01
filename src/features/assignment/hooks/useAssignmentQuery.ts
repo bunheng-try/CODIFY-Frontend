@@ -1,36 +1,48 @@
 import {useQuery ,useQueryClient,useMutation} from "@tanstack/react-query";
-import type { Assignment, AssignmentDto } from "@/shared/types/types";
-import { assignmentsApi } from "../apis/fetchAssignments";
+import { assignmentsApi, type Assignment, type CreateAssignmentDto, type UpdateAssignmentDto } from "../apis/assignment.api";
 import { useNavigate } from "react-router-dom";
 
 export const QUERY_KEYS = {
-  ASSIGNMENTS: (classroomId: string) => ["assignments", classroomId] as const,
-  ASSIGNMENTID: (assignmentId: string) => ["assignment", assignmentId] as const,
+  ASSIGNMENTS: (classroomId: number) =>
+    ["assignments", classroomId] as const,
+
+  ASSIGNMENT: (classroomId: number, assignmentId: number) =>
+    ["assignment", classroomId, assignmentId] as const,
 };
 
 
-export const useAssignmentClassrooms = (classroomId: string | null) => {
-  return useQuery<Assignment[], Error>({
+export const useAssignmentClassrooms = (classroomId: number | null) => {
+  return useQuery<Assignment[]>({
     queryKey: classroomId
-        ? QUERY_KEYS.ASSIGNMENTS(classroomId)
-        : ["assignments", "none"],
+      ? QUERY_KEYS.ASSIGNMENTS(classroomId)
+      : ["assignments", "none"],
+
+    enabled: !!classroomId,
 
     queryFn: () => {
-        if (!classroomId) throw new Error("No classroom selected");
-        return assignmentsApi.getAssignmentByClassId(classroomId);
+      if (!classroomId) throw new Error("No classroom selected");
+      return assignmentsApi.getByClassroomId(classroomId);
     },
   });
 };
 
-export const useAssignment = (assignmentId: string | null) => {
-  return useQuery<Assignment, Error>({
-    queryKey: assignmentId
-        ? QUERY_KEYS.ASSIGNMENTID(assignmentId)
-        : ["assignment","none"],
+export const useAssignment = (
+  classroomId: number | null,
+  assignmentId: number | null
+) => {
+  return useQuery<Assignment>({
+    queryKey:
+      classroomId && assignmentId
+        ? QUERY_KEYS.ASSIGNMENT(classroomId, assignmentId)
+        : ["assignment", "none"],
+
+    enabled: !!classroomId && !!assignmentId,
 
     queryFn: () => {
-        if (!assignmentId) throw new Error("No classroom selected");
-        return assignmentsApi.getAssignmentById(assignmentId);
+      if (!classroomId || !assignmentId)
+        throw new Error("Missing ids");
+
+      return assignmentsApi.getById(classroomId, assignmentId);
     },
   });
 };
@@ -39,52 +51,118 @@ export const useAssignment = (assignmentId: string | null) => {
 export const usePublishAssignment = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<Assignment, Error, string>({
-    mutationFn: (assignmentId: string) => assignmentsApi.publishAssignment(assignmentId),
+  return useMutation({
+    mutationFn: ({
+      classroomId,
+      assignmentId,
+    }: {
+      classroomId: number;
+      assignmentId: number;
+    }) =>
+      assignmentsApi.publish(classroomId, assignmentId),
+
     onSuccess: (updatedAssignment: Assignment) => {
-      // Update the single assignment cache
       queryClient.setQueryData(
-        QUERY_KEYS.ASSIGNMENTID(updatedAssignment.id),
+        QUERY_KEYS.ASSIGNMENT(
+          updatedAssignment.sectionId,
+          updatedAssignment.id
+        ),
         updatedAssignment
       );
 
-      // update the list of assignments for that classroom
-      queryClient.setQueryData<Assignment[]>(
-        QUERY_KEYS.ASSIGNMENTS(updatedAssignment.classroomId),
-        (oldList = []) =>
-          oldList.map((a) =>
-            a.id === updatedAssignment.id ? updatedAssignment : a
-          )
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.ASSIGNMENTS(
+          updatedAssignment.sectionId
+        ),
+      });
+    },
+  });
+};
+
+export const useCreateAssignment = (classroomId: number | null) => {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  return useMutation({
+    mutationFn: (dto: CreateAssignmentDto) => {
+      if (!classroomId) throw new Error("No classroom selected");
+
+      return assignmentsApi.create(classroomId, dto);
+    },
+
+    onSuccess: (newAssignment: Assignment) => {
+      if (!classroomId) return;
+
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.ASSIGNMENTS(classroomId),
+      });
+
+      navigate(
+        `/classrooms/${classroomId}/assignments/${newAssignment.id}`
       );
     },
   });
 };
 
-export const useCreateAssignment = (classroomId: string | null) => {
+export const useUpdateAssignment = () => {
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
 
-  return useMutation<Assignment, Error, AssignmentDto>({
-    mutationFn: (dto: AssignmentDto) => {
-      if (!classroomId) throw new Error("No classroom selected");
-      console.log(dto,classroomId);
-      return assignmentsApi.createAssignment(dto); // <-- return here
-    },
+  return useMutation({
+    mutationFn: ({
+      classroomId,
+      assignmentId,
+      dto,
+    }: {
+      classroomId: number;
+      assignmentId: number;
+      dto: UpdateAssignmentDto;
+    }) =>
+      assignmentsApi.update(classroomId, assignmentId, dto),
 
-    onSuccess: (newAssignment: Assignment) => {
-      if (!classroomId) return;
-      queryClient.setQueryData<Assignment[]>(
-        QUERY_KEYS.ASSIGNMENTS(classroomId),
-        (old = []) => [...old, newAssignment]
-      );
-
-      // Cache the new assignment individually
+    onSuccess: (updatedAssignment) => {
       queryClient.setQueryData(
-        QUERY_KEYS.ASSIGNMENTID(newAssignment.id),
-        newAssignment
+        QUERY_KEYS.ASSIGNMENT(
+          updatedAssignment.sectionId,
+          updatedAssignment.id
+        ),
+        updatedAssignment
       );
 
-      navigate(`/classrooms/${classroomId}/assignments/${newAssignment.id}`);
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.ASSIGNMENTS(
+          updatedAssignment.sectionId
+        ),
+      });
+    },
+  });
+};
+
+export const useDeleteAssignment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      classroomId,
+      assignmentId,
+    }: {
+      classroomId: number;
+      assignmentId: number;
+    }) =>
+      assignmentsApi.delete(classroomId, assignmentId),
+
+    onSuccess: (_, variables) => {
+      const { classroomId, assignmentId } = variables;
+
+      queryClient.removeQueries({
+        queryKey: QUERY_KEYS.ASSIGNMENT(
+          classroomId,
+          assignmentId
+        ),
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.ASSIGNMENTS(classroomId),
+      });
     },
   });
 };

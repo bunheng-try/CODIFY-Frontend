@@ -1,6 +1,6 @@
 
 import { MainBar } from "@/shared/components/layout/MainBar";
-import { useClassroomRoute } from "@/features/class/hooks/useClassroomRoute";
+import { useClassroomRoute } from "@/features/classes/hooks/useClassroomRoute";
 import { useAssignmentClassrooms, useCreateAssignment } from "@/features/assignment/hooks/useAssignmentQuery";
 import AssignmentCard from "@/shared/components/ui/assignmentCard";
 import { useSelectedClassroom } from "../hooks/useClassroom";
@@ -13,6 +13,7 @@ import { useClassroomActions } from "../hooks/useClassroomAction";
 import { useState } from "react";
 import { getClassroomContextMenu } from "./classContextMenu";
 import { useContextMenu } from "@/shared/components/context-menu/ContextMenuProvider";
+import type { CreateAssignmentDto } from "@/features/assignment/apis/assignment.api";
 
 const MainBarClassroom = () => {
   const navigate = useNavigate();
@@ -24,11 +25,11 @@ const MainBarClassroom = () => {
   const { deleteClassroom, editClassroom } = useClassroomActions();
   
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
-  const [classToDelete, setClassToDelete] = useState<string | null>(null)
+  const [classToDelete, setClassToDelete] = useState<number | null>(null)
 
   const [openEdit, setOpenEdit] = useState(false);
     const [selectedClass, setSelectedClass] = useState<{
-    id: string;
+    id: number;
     name: string;
   } | null>(null);
 
@@ -62,9 +63,9 @@ const MainBarClassroom = () => {
 
     if(classroomId==null) return;
     
-    const newAssignmentPayload:AssignmentDto = {
+    const newAssignmentPayload: CreateAssignmentDto = {
+      classroomId: classroomId,
       title: "New Assignment",
-      classroomId: Number(classroomId),
       dueAt: tomorrow.toISOString(),
       description:"",
       position:0
@@ -73,14 +74,14 @@ const MainBarClassroom = () => {
     createAssignment(newAssignmentPayload)
   };
 
-  const handleEdit = (classroomId: string) => {
+  const handleEdit = (classroomId: number) => {
     const cls = classroom
     if (!cls) return;
     setSelectedClass({ id: classroomId, name: cls.name });
     setOpenEdit(true);
   };
 
-  const handleOpenDelete = (id: string) => {
+  const handleOpenDelete = (id: number) => {
     setClassToDelete(id)
     setConfirmDeleteOpen(true)
   }

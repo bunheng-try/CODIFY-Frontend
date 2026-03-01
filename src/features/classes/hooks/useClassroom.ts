@@ -4,7 +4,7 @@ import { classroomApi, type Classroom } from "../apis/classroom.api";
 
 export const QUERY_KEYS = {
     CLASSROOMS: ["classrooms"] as const,
-    CLASSROOM_DETAIL: (id: string) => ["classroom", id] as const,
+    CLASSROOM_DETAIL: (id: number) => ["classroom", id] as const,
 };
 
 // --- QUERIES ---
@@ -16,9 +16,11 @@ export const useClassrooms = () => {
     });
 };
 
-export const useSelectedClassroom = (classroomId: string | null) => {
+export const useSelectedClassroom = (classroomId: number | null) => {
     return useQuery<Classroom, Error>({
-        queryKey: classroomId ? QUERY_KEYS.CLASSROOM_DETAIL(classroomId) : ["classroom", "none"],
+        queryKey: classroomId
+            ? QUERY_KEYS.CLASSROOM_DETAIL(classroomId)
+            : ["classroom", "none"],
         queryFn: () => {
             if (!classroomId) throw new Error("No classroom selected");
             return classroomApi.getById(classroomId);
@@ -36,7 +38,10 @@ export const useCreateClassroom = () => {
         mutationFn: (data) => classroomApi.create(data),
         onSuccess: (newClassroom) => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CLASSROOMS });
-            queryClient.setQueryData(QUERY_KEYS.CLASSROOM_DETAIL(newClassroom.id), newClassroom);
+            queryClient.setQueryData(
+                QUERY_KEYS.CLASSROOM_DETAIL(newClassroom.id),
+                newClassroom
+            );
         },
     });
 };
@@ -47,12 +52,15 @@ export const useUpdateClassroom = () => {
     return useMutation<
         Classroom,
         Error,
-        { id: string; data: { name?: string; description?: string } }
+        { id: number; data: { name?: string; description?: string } }
     >({
         mutationFn: ({ id, data }) => classroomApi.update(id, data),
-        onSuccess: (updatedClassroom, { id }) => {
+        onSuccess: (updatedClassroom) => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CLASSROOMS });
-            queryClient.setQueryData(QUERY_KEYS.CLASSROOM_DETAIL(id), updatedClassroom);
+            queryClient.setQueryData(
+                QUERY_KEYS.CLASSROOM_DETAIL(updatedClassroom.id),
+                updatedClassroom
+            );
         },
     });
 };
@@ -60,11 +68,13 @@ export const useUpdateClassroom = () => {
 export const useDeleteClassroom = () => {
     const queryClient = useQueryClient();
 
-    return useMutation<void, Error, string>({
+    return useMutation<void, Error, number>({
         mutationFn: (id) => classroomApi.delete(id),
         onSuccess: (_, id) => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CLASSROOMS });
-            queryClient.removeQueries({ queryKey: QUERY_KEYS.CLASSROOM_DETAIL(id) });
+            queryClient.removeQueries({
+                queryKey: QUERY_KEYS.CLASSROOM_DETAIL(id),
+            });
         },
     });
 };

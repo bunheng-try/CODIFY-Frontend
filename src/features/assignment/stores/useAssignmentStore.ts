@@ -1,8 +1,8 @@
 import { create } from "zustand";
 
 interface AssignmentState {
-  selectedAssignmentId: string | null;
-  setSelectedAssignmentId: (id: string | null) => void;
+  selectedAssignmentId: number | null;
+  setSelectedAssignmentId: (id: number | null) => void;
 }
 
 export const useAssignmentStore = create<AssignmentState>((set) => ({

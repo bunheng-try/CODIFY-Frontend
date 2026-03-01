@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import type { Assignment } from "@/shared/types/types";
+import type { Assignment } from "../apis/assignment.api";
 
 const DEFAULT_TIME = "23:59";
 
@@ -21,9 +21,9 @@ export const useAssignmentSettings = (assignment: Assignment) => {
 
   const [dueDate, setDueDate] = useState(initDate);
   const [timeDue, setTimeDue] = useState(initTime || DEFAULT_TIME);
-  const [points, setPoints] = useState(
-    assignment.points != null ? String(assignment.points) : ""
-  );
+  // const [points, setPoints] = useState(
+  //   assignment.points != null ? String(assignment.points) : ""
+  // );
   const [description, setDescription] = useState(
     assignment.description || ""
   );
@@ -33,7 +33,7 @@ export const useAssignmentSettings = (assignment: Assignment) => {
 
     setDueDate(date);
     setTimeDue(time || DEFAULT_TIME);
-    setPoints(assignment.points != null ? String(assignment.points) : "");
+    // setPoints(assignment.points != null ? String(assignment.points) : "");
     setDescription(assignment.description || "");
   }, [assignment]);
 
@@ -45,7 +45,7 @@ export const useAssignmentSettings = (assignment: Assignment) => {
         dueDate && timeDue
           ? `${dueDate}T${timeDue}:00`
           : assignment.dueAt,
-      points: points ? Number(points) : assignment.points,
+      // points: points ? Number(points) : assignment.points,
       description: description || assignment.description,
     };
 
@@ -57,7 +57,7 @@ export const useAssignmentSettings = (assignment: Assignment) => {
 
     setDueDate(date);
     setTimeDue(time || DEFAULT_TIME);
-    setPoints(assignment.points != null ? String(assignment.points) : "");
+    // setPoints(assignment.points != null ? String(assignment.points) : "");
     setDescription(assignment.description || "");
   };
 
@@ -75,8 +75,8 @@ export const useAssignmentSettings = (assignment: Assignment) => {
     setDueDate,
     timeDue,
     setTimeDue,
-    points,
-    setPoints,
+    // points,
+    // setPoints,
     description,
     setDescription,
     showDeleteDialog,
