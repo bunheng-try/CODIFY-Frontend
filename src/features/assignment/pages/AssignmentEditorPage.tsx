@@ -42,7 +42,7 @@ const AssignmentEditor = () => {
       emptyState={<div className="p-6 text-gray-400">No content</div>}
     >
       <div className="flex-1 overflow-auto">
-        {activeTab === "challenge" && <ChallengeTab assignmentId={assignmentId} />}
+        {activeTab === "challenge" && <ChallengeTab challenges={assignment.codingChallenges} />}
         {activeTab === "settings" && (
           <SettingsTab
             assignment={assignment}

@@ -55,7 +55,7 @@ const MainBarClassroom = () => {
   };
 
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     // TODO - Create Assignment
 
     const tomorrow = new Date();
@@ -102,7 +102,7 @@ const MainBarClassroom = () => {
         ) : assignments.length === 0 ? (
           <p>No assignments found</p>
         ) : (
-          assignments.map((a) => (
+          assignments.slice().sort((a, b) => a.id - b.id).map((a) => (
             <AssignmentCard
               key={a.id}           
               assignment={a}        

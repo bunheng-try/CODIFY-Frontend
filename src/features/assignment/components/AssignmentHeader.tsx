@@ -2,11 +2,12 @@ import MenuTabs from "@/shared/components/menu_tabs/MenuTabs";
 import { Button } from "@/shared/components/ui/button";
 import { useAssignmentTabs } from "../hooks/useMenuTabs";
 import { CodeIcon, MoreVerticalIcon, PencilIcon, SettingsIcon, UsersIcon } from "lucide-react";
-import { usePublishAssignment, useUpdateAssignment } from "../hooks/useAssignmentQuery";
+import { usePublishAssignment, useUnPublishAssignment, useUpdateAssignment } from "../hooks/useAssignmentQuery";
 import type { Assignment } from "../apis/assignment.api";
 import type { JSX } from "react";
 import { BasePanelHeader } from "@/shared/components/layout/mainPanel/BasePanelHeader";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 type Props = {
   classroomId: number
@@ -14,9 +15,10 @@ type Props = {
   isEditing: boolean;
 };
 
-const AssignmentHeader = ({ classroomId, assignment, isEditing }: Props) => {
+const AssignmentHeader = ({ classroomId, assignment, isEditing}: Props) => {
   const { activeTab, setActiveTab } = useAssignmentTabs();
-  const { mutate: publishAssignment} = usePublishAssignment();
+  const { mutate: publishAssignment } = usePublishAssignment();
+  const { mutate: unpublishAssignment } = useUnPublishAssignment();
   const {mutate:updateAssignment}= useUpdateAssignment();
   const [titleInput, setTitleInput] = useState(assignment.title);
 
@@ -24,8 +26,20 @@ const AssignmentHeader = ({ classroomId, assignment, isEditing }: Props) => {
 
   const showPublishedUI = assignment.isPublished && !isEditing;
 
+  const titleInputRef = useRef<HTMLInputElement>(null);
+
+  const location = useLocation();
+  const autoFocusTitle = location.state?.autoFocusTitle || false;
+
+  useEffect(() => {
+    if (autoFocusTitle && titleInputRef.current) {
+      titleInputRef.current.focus();
+      titleInputRef.current.select();
+    }
+  }, [autoFocusTitle]);
+
   const handlePublish = () => publishAssignment({classroomId, assignmentId: assignment.id});
-  const handleUnpublish = () => console.log("Assignment unpublished");
+  const handleUnpublish = () => unpublishAssignment({ classroomId, assignmentId: assignment.id });
   const handleDiscard = () => console.log("Assignment discarded");
 
   const handleMenuClick = () => console.log("Three-dot menu clicked");
@@ -54,6 +68,7 @@ const AssignmentHeader = ({ classroomId, assignment, isEditing }: Props) => {
     <div className="flex items-center gap-2 min-w-0">
       <input
         type="text"
+        ref={titleInputRef}
         value={titleInput}
         onChange={(e) => setTitleInput(e.target.value)}
         onBlur={() => {

@@ -63,6 +63,37 @@ export const usePublishAssignment = () => {
     }) =>
       assignmentsApi.publish(classroomId, assignmentId),
 
+    onSuccess: (updatedAssignment: Assignment,) => {
+      queryClient.setQueryData(
+        QUERY_KEYS.ASSIGNMENT(
+          updatedAssignment.classroomId,
+          updatedAssignment.id
+        ),
+        updatedAssignment
+      );
+
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.ASSIGNMENTS(
+          updatedAssignment.classroomId
+        ),
+      });
+    },
+  });
+};
+
+export const useUnPublishAssignment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      classroomId,
+      assignmentId,
+    }: {
+      classroomId: number;
+      assignmentId: number;
+    }) =>
+      assignmentsApi.unPublish(classroomId, assignmentId),
+
     onSuccess: (updatedAssignment: Assignment) => {
       queryClient.setQueryData(
         QUERY_KEYS.ASSIGNMENT(
@@ -100,7 +131,8 @@ export const useCreateAssignment = (classroomId: number | null) => {
       });
 
       navigate(
-        `/classrooms/${classroomId}/assignments/${newAssignment.id}`
+        `/classrooms/${classroomId}/assignments/${newAssignment.id}`,
+        { state:{ autoFocusTitle: true } }
       );
     },
   });
@@ -170,22 +202,23 @@ export const useDeleteAssignment = () => {
 };
 
 export const useAssignmentAddChallenge = () => {
-  
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: ({
       classroomId,
       assignmentId,
-      challengesId
-    }:{
-    classroomId: number,
-    assignmentId: number,
-    challengesId: number[]
-      }) => assignmentsApi.addChallenge(classroomId, assignmentId, challengesId),
-    onSuccess: () => {
-      
-    }
-    
+      challengeIds,
+    }: {
+      classroomId: number;
+      assignmentId: number;
+      challengeIds: number[];
+    }) => assignmentsApi.addChallenge(classroomId, assignmentId, challengeIds),
+
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.ASSIGNMENT(variables.classroomId, variables.assignmentId),
+      });
+    },
   });
-}
+};

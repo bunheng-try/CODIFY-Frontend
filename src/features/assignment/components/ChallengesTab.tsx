@@ -2,31 +2,31 @@ import { useState } from "react";
 import { Plus, EllipsisVertical } from "lucide-react";
 import { ChallengeCard } from "../components/ChallengeItemCard";
 import { AddChallengeLibraryModal } from "../components/AddChallengeLibraryModal";
-import { AddNewChallengeModal } from "../components/AddNewChallengeModal";
 import type { Challenge } from "../types/assignment";
 import { useChallenges } from "@/features/challenge/hooks/useChallengeQuery";
-
-interface ChallengeTabProps {
-  assignmentId: number;
-}
+import { useAssignmentAddChallenge } from "../hooks/useAssignmentQuery";
+import { useClassroomRoute } from "@/features/classes/hooks/useClassroomRoute";
 
 
-const ChallengeTab = ({assignmentId}: ChallengeTabProps) => {
-  const [challenges, setChallenges] = useState<Challenge[]>([]);
+
+const ChallengeTab = ({challenges=[]}:{challenges:Challenge[]}) => {
   const [libraryOpen, setLibraryOpen] = useState(false);
-  const [createOpen, setCreateOpen] = useState(false);
 
-  const {data:challenge} = useChallenges();
+  const { assignmentId,classroomId} = useClassroomRoute();
+
+  const { data: challenge } = useChallenges();
+  const { mutate: addChallengeToAssignment } = useAssignmentAddChallenge();
 
   const addFromLibrary = (selected: Challenge[]) => {
-    const existingIds = challenges.map(c => c.id);
-    const newOnes = selected.filter(s => !existingIds.includes(s.id));
-    setChallenges(prev => [...prev, ...newOnes]);
+    const ids = selected.map((c) => c.id);
+    
+    if (!classroomId || !assignmentId) return;
+
+    addChallengeToAssignment(
+      { classroomId, assignmentId, challengeIds: ids },
+    );
   };
 
-  const createNew = (challenge: Challenge) => {
-    setChallenges(prev => [...prev, challenge]);
-  };
 
   return (
     <div className="w-full max-w-5xl mx-auto p-6">
@@ -50,16 +50,11 @@ const ChallengeTab = ({assignmentId}: ChallengeTabProps) => {
       <AddChallengeLibraryModal
         isOpen={libraryOpen}
         onClose={() => setLibraryOpen(false)}
-        onCreateNew={() => { setLibraryOpen(false); setCreateOpen(true); }}
+        onCreateNew={() => { console.log("navigate to challenge create") }}
         onAddSelected={addFromLibrary}
         libraryChallenges={challenge|| []}
       />
 
-      <AddNewChallengeModal
-        isOpen={createOpen}
-        onClose={() => setCreateOpen(false)}
-        onAdd={createNew}
-      />
     </div>
   );
 };
