@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Plus } from "lucide-react";
-import type { LibraryChallenge, TestCase } from "../types/challenge";
+import type { LibraryChallenge, TestCase } from "../../types/challenge";
 import { Button } from "@/shared/components/ui/button";
 import { Badge } from "@/shared/components/ui/badge";
 import { TestCaseFormDialog } from "./TestCaseFormDialog";

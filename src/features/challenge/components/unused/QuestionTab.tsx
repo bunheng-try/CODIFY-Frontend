@@ -1,7 +1,7 @@
 // QuestionTab.tsx - Question tab content
 
 import React, { useState } from 'react'
-import type { MockChallenge } from './challengesData'
+import type { MockChallenge } from '../inused/challengesData'
 
 interface QuestionTabProps {
   challenge: MockChallenge

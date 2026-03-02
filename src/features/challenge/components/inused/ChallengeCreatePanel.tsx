@@ -3,8 +3,8 @@
 // Same tab structure as detail view
 
 import { useState } from "react";
-import { useChallengeStore } from "../stores/challengeStore";
-import type { LibraryChallenge, TestCase } from "../types/challenge";
+import { useChallengeStore } from "../../stores/challengeStore";
+import type { LibraryChallenge, TestCase } from "../../types/challenge";
 import { ChallengeCreateHeader } from "./ChallengeCreateHeader";
 import { ChallengeInfoTab } from "./ChallengeInfoTab";
 import { ChallengeStartCodeTab } from "./ChallengeStartCodeTab";

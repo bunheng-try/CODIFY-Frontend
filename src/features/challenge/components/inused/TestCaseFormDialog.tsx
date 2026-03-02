@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { FormDialog } from "@/shared/components/design/dialog/FormDialog";
 import { Input } from "@/shared/components/ui/input";
-import type { TestCase } from "../types/challenge";
+import type { TestCase } from "../../types/challenge";
 
 type FormErrors = Partial<Record<keyof TestCase, string>>;
 

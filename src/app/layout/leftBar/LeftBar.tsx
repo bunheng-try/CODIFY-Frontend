@@ -74,6 +74,7 @@ export function LeftBar() {
           <LeftBarButton
             icon={<Library className="h-5 w-5" />}
             tooltip="Exercise library"
+            onClick={() => navigate('challenge-library')}
           />
           <LeftBarButton
             icon={<User className="h-5 w-5 text-primary" />}

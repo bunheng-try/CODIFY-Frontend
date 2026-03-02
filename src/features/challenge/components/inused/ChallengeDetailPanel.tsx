@@ -1,8 +1,8 @@
 // features/challenge/components/ChallengeDetailPanel.tsx
 
 import { useState, useEffect } from "react";
-import type { LibraryChallenge } from "../types/challenge";
-import { useChallengeStore } from "../stores/challengeStore";
+import type { LibraryChallenge } from "../../types/challenge";
+import { useChallengeStore } from "../../stores/challengeStore";
 import { ChallengeDetailHeader, type ChallengeTabKey } from "./ChallengeDetailHeader";
 import { ChallengeInfoTab } from "./ChallengeInfoTab";
 import { ChallengeStartCodeTab } from "./ChallengeStartCodeTab";

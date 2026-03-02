@@ -2,7 +2,7 @@
 // Setting tab — Points, Difficulty, Category, AI Evaluation, Add Rubric
 
 import { useState } from "react";
-import type { LibraryChallenge } from "../types/challenge";
+import type { LibraryChallenge } from "../../types/challenge";
 import { Input } from "@/shared/components/ui/input";
 import { ButtonSecondary } from "@/shared/components/design/button";
 import { Paperclip } from "lucide-react";

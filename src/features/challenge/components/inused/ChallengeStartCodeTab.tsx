@@ -1,7 +1,7 @@
 // features/challenge/components/ChallengeStartCodeTab.tsx
 // Start Code tab — Language dropdown + Starter Code textarea
 
-import type { LibraryChallenge } from "../types/challenge";
+import type { LibraryChallenge } from "../../types/challenge";
 import { Textarea } from "@/shared/components/ui/textarea";
 
 interface ChallengeStartCodeTabProps {

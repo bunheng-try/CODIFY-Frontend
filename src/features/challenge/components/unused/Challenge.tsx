@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import { getChallengeById } from "./challengesData";
+import { getChallengeById } from "../inused/challengesData";
 import ChallengeHeader from "./ChallengesHeader";
 import QuestionTab from "./QuestionTab";
 import CodeTab from "./CodeTab";
 import TestCaseTab from "./TestCaseTab";
-import "../Challenges.css";
+// import "../Challenges.css";
 
 type TabType = "question" | "code" | "testcase";
 

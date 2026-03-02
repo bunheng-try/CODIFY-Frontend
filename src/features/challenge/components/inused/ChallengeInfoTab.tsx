@@ -1,7 +1,7 @@
 // features/challenge/components/ChallengeInfoTab.tsx
 // Description tab — Title + Description only
 
-import type { LibraryChallenge } from "../types/challenge";
+import type { LibraryChallenge } from "../../types/challenge";
 import { Input } from "@/shared/components/ui/input";
 import { Textarea } from "@/shared/components/ui/textarea";
 

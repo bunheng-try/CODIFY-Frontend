@@ -1,6 +1,6 @@
 
 import React from 'react'
-import type { MockChallenge } from './challengesData'
+import type { MockChallenge } from '../inused/challengesData'
 
 interface CodeTabProps {
   challenge: MockChallenge

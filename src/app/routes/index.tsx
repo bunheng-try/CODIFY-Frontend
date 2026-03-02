@@ -1,6 +1,6 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
-import Challenge from "@/features/challenge/components/Challenge";
+import Challenge from "@/features/challenge/components/unused/Challenge";
 
 import { ShowroomLayout } from "@/showroom/ShowroomLayout";
 import { ButtonsShowroom } from "@/showroom/routes/design/buttons.page";
@@ -15,6 +15,9 @@ import { ProtectedRoute } from "./protectedRoute";
 import SignInPage from "@/features/auth/pages/SignInPage";
 import { NoClassSelected } from "@/features/classes/components/NoClassSelected";
 import StudentManagement from "@/features/class/components/StudentManagement";
+import { ChallengeLibraryPage } from "@/features/challenge/pages/ChallengeLibraryPage";
+import ChallengeEditorPanel from "@/features/challenge/pages/ChallengeEditorPanel";
+import { ChallengeDetailPanel } from "@/features/challenge/hooks/ChallengeDetailPanel";
 
 const router = createBrowserRouter([
   { path: "/signin", element: <SignInPage /> },
@@ -23,9 +26,9 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: (
-      // <ProtectedRoute>
+      <ProtectedRoute>
         <AppShell />
-      // </ProtectedRoute>
+      </ProtectedRoute>
     ),
     children: [
       {
@@ -49,6 +52,20 @@ const router = createBrowserRouter([
             element: <StudentManagement />,
           }
         ],
+      },
+      {
+        path: "challenge-library",
+        element: <ChallengeLibraryPage />,
+        children: [
+          {
+            index: true,
+            element: <NoClassSelected />,
+          },
+          {
+            path: ":challengeId",
+            element: <ChallengeDetailPanel />,
+          },
+        ]
       },
   ],
   },

@@ -87,6 +87,10 @@ export const useDeleteTestCase = () => {
                 queryKey: QUERY_KEYS.TESTCASE(id),
                 exact: true,
             });
+            
+            queryClient.invalidateQueries({
+                queryKey: QUERY_KEYS.TESTCASES(id),
+            });
         },
     });
 };
