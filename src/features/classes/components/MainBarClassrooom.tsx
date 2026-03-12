@@ -2,7 +2,7 @@
 import { MainBar } from "@/shared/components/layout/MainBar";
 import { useClassroomRoute } from "@/features/classes/hooks/useClassroomRoute";
 import { useAssignmentClassrooms, useCreateAssignment, useDeleteAssignment } from "@/features/assignment/hooks/useAssignmentQuery";
-import AssignmentCard from "@/shared/components/ui/assignmentCard";
+import { AssignmentCard } from "@/features/assignment/components/assignmentCard";
 import { useSelectedClassroom } from "../hooks/useClassroomQuery";
 import type {  AssignmentDto } from "@/shared/types/types";
 import { useNavigate} from "react-router-dom"
@@ -104,18 +104,12 @@ const MainBarClassroom = () => {
         ) : (
           assignments.slice().sort((a, b) => a.id - b.id).map((a) => (
             <AssignmentCard
-              key={a.id}           
-              assignment={a}        
-              isSelect={a.id==assignmentId}  
-              onDelete={() => {
-                deleteAssignment({classroomId,assignmentId:a.id})
-              }}
-              onClick={() => {
-                navigate(
-                  `/classrooms/${classroomId}/assignments/${a.id}`
-                )
-              }}
+              key={a.id}
+              assignment={a}
+              isSelect={a.id === assignmentId}
+              onClick={() => navigate(`/classrooms/${classroomId}/assignments/${a.id}`)}
               totalStudent={67}
+              showActions={true}
             />
           ))
         )}

@@ -42,7 +42,7 @@ export function LeftBar() {
 
   return (
     <>
-      <aside className="flex h-full w-16 flex-col border-r border-border bg-card">
+      <aside className="flex h-full w-16 flex-col border-r border-border bg-[hsl(var(--surface-2))]">
         {classes.length === 0 && (
           <div className="flex flex-col items-center justify-center flex-1 px-2 py-4 text-center text-sm text-[hsl(var(--muted-foreground))]">
             <p>No classes available</p>

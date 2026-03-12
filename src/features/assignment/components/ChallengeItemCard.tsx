@@ -1,67 +1,75 @@
-import { Code2, MoreVertical, Star, Tag, Trophy, User, FileCode, CheckCircle2 } from "lucide-react";
-import type { Challenge } from "../types/assignment";
+import { Card, CardHeader, CardMeta } from "@/shared/components/design/Card";
+import { WrapIcon } from "@/shared/components/ui/wrapIcon";
+import { FileCode, MoreVertical, Star, Tag, Trophy, User } from "lucide-react";
+import { Badge } from "@/shared/components/ui/badge";
 
-
-interface Props {
-  challenge: Challenge;
+interface ChallengeCardProps {
+  challenge: any;
   showDescription?: boolean;
-  selectable?: boolean;
   isSelected?: boolean;
-  onSelect?: (id: string) => void;
+  onSelect?: (id: number) => void;
+  index?: number; // order number
 }
 
-export const ChallengeCard = ({ challenge, showDescription, selectable, isSelected, onSelect }: Props) => {
-  const getDifficultyStyle = (level: string) => {
-    switch (level) {
-      case "Easy": return "bg-[#E6F6EB] text-[#2DB755]";
-      case "Medium": return "bg-[#FFF8E6] text-[#FFB800]";
-      case "High": case "Hard": return "bg-[#FEECEC] text-[#FF4D4F]";
-      default: return "bg-gray-100 text-gray-500";
-    }
-  };
-
+export const ChallengeCard = ({
+  challenge,
+  showDescription = false,
+  isSelected = false,
+  onSelect,
+  index = 1,
+}: ChallengeCardProps) => {
   return (
-    <div 
-      onClick={() => selectable && onSelect?.(challenge.id.toString())}
-      className={`bg-white rounded-xl px-4 py-4 border transition-all mb-3 flex items-center justify-between cursor-pointer
-        ${isSelected ? "border-[#7B57E0] ring-1 ring-[#7B57E0]" : "border-gray-100 shadow-sm hover:border-gray-200"}`}
-    >
-      <div className="flex items-center gap-4">
-        <div className="relative">
-          <div className="w-10 h-10 bg-[#3B82F6] rounded-lg flex items-center justify-center ">
-            <FileCode className="w-5 h-5 text-white" strokeWidth={2.5} />
-          </div>
-          {isSelected && (
-            <div className="absolute -top-2 -right-2 bg-[#7B57E0] text-white rounded-full">
-              <CheckCircle2 size={16} fill="white" className="text-[#7B57E0]" />
-            </div>
-          )}
+    <Card isSelected={isSelected} onClick={() => onSelect?.(challenge.id)}>
+      <div className="flex items-start gap-3">
+        {/* Lead / Order */}
+        <div className="w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-md bg-[hsl(var(--muted))] text-[hsl(var(--foreground))] font-semibold">
+          {index}
         </div>
 
-        <div className="flex flex-col gap-0.5">
-          <div className="flex items-center gap-2">
-            <h3 className="font-bold text-[15px] text-[#1A1A1A]">{challenge.title}</h3>
-            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${getDifficultyStyle(challenge.level||"Easy")}`}>
-              {challenge.level|| "Easy"}
-            </span>
-          </div>
-          {showDescription && <p className="text-[12px] text-gray-400 font-medium">{challenge.description || "Challenge description..."}</p>}
-          <div className="flex items-center gap-4 text-[12px] text-[#A0A0A0] font-semibold mt-0.5">
-            <div className="flex items-center gap-1.5"><Trophy size={14} /><span>{challenge.score||100} Score</span></div>
-            <div className="flex items-center gap-1.5"><Code2 size={14} /><span>{challenge.language}</span></div>
-            <div className="flex items-center gap-1.5"><Tag size={14} /><span>{challenge.topic||"Array"}</span></div>
-          </div>
+        <div className="flex-1 flex flex-col gap-1">
+          {/* Header with actions */}
+          <CardHeader
+            title={
+              <p className="font-bold text-[15px] text-[hsl(var(--foreground))] break-words">
+                {challenge.title}
+              </p>
+            }
+            actions={
+              <div className="flex items-center gap-2">
+                <WrapIcon icon={User} size="default" variantColor="default" />
+                <WrapIcon icon={Star} size="default" variantColor="default" />
+                <WrapIcon icon={MoreVertical} size="default" variantColor="default" />
+              </div>
+            }
+            className="items-start"
+          />
+
+          <Badge variant={`challenge-${(challenge.level || "Easy").toLowerCase()}`}>
+            {challenge.level || "Easy"}
+          </Badge>
+
+          {/* Optional description */}
+          {showDescription && (
+            <p className="text-sm text-[hsl(var(--muted-foreground))]">{challenge.description}</p>
+          )}
+
+          {/* Stats / Meta */}
+          <CardMeta>
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <Trophy size={14} />
+              <span>{challenge.score || 100} Score</span>
+            </div>
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <FileCode size={14} />
+              <span>{challenge.language}</span>
+            </div>
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <Tag size={14} />
+              <span>{challenge.topic || "Array"}</span>
+            </div>
+          </CardMeta>
         </div>
       </div>
-
-      {!selectable && (
-        <div className="flex items-center gap-2">
-          <button className="p-2 text-[#3B82F6]"><User size={18} fill="currentColor" /></button>
-          <button className="p-2 text-gray-300"><Star size={18} /></button>
-          <button className="p-2 text-gray-300"><MoreVertical size={18} /></button>
-        </div>
-      )}
-    </div>
-    
+    </Card>
   );
 };

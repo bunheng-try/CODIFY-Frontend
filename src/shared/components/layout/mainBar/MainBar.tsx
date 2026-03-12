@@ -18,7 +18,7 @@ export const MainBar: React.FC<MainBarProps> = ({
     create,
     children,
 }) => (
-    <div className="flex flex-col px-8 h-full w-full border-r">
+    <div className="flex flex-col px-8 h-full w-full border-r bg-[hsl(var(--surface-2))]">
         {/* Header */}
         <div className="sticky top-0 z-10 border-b py-6">
             <div className="flex items-center justify-between">

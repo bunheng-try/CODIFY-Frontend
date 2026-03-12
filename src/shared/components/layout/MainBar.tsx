@@ -21,10 +21,10 @@ export const MainBar: React.FC<MainBarProps> = ({
   create,
 }) => {
   return (
-    <div className="flex flex-col px-8 h-full w-full bg-[hsl(var(--background))] text-[hsl(var(--foreground))] rounded-tl-2xl border-r ">
+    <div className="flex flex-col px-8 h-full w-full bg-[hsl(var(--surface-2))] text-[hsl(var(--foreground))]  border-r ">
 
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-[hsl(var(--background))] border-b border-[hsl(var(--border))]  py-6 flex flex-col">
+      <div className="sticky top-0 z-10 border-b border-[hsl(var(--border))]  py-6 flex flex-col">
         {/* Top row: title + actions */}
         <div className="flex items-center justify-between">
           <h1 className="text-xl sm:text-3xl font-bold tracking-tight text-[hsl(var(--foreground))] truncate">

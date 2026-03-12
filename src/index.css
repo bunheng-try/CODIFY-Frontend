@@ -3,38 +3,97 @@
 
 :root {
   --radius: 6px;
-  
-  /* danger */
-  --destructive: 0 70% 50%;
-  --destructive-foreground: 0 0% 100%;
 
-  /* Backgrounds */
+  /* =========================
+     Layout
+     ========================= */
+
   --background: 260 20% 97%;
-  --card: 0 0% 100%;
+  --workspace: 260 18% 95%;
+  --canvas: 260 20% 98%;
+  --navigation: 260 18% 93%;
+  --panel: 260 16% 91%;
 
-  /* Text */
+  /* =========================
+     Surfaces
+     ========================= */
+
+  --surface: 0 0% 100%;
+  --surface-muted: 260 16% 94%;
+  --surface-hover: 270 40% 96%;
+  --surface-active: 270 45% 92%;
+
+  /* =========================
+     Text
+     ========================= */
+
   --foreground: 260 10% 15%;
-  --muted-foreground: 260 5% 45%;
+  --muted-foreground: 260 6% 42%;
 
-  /* Brand (Slack-like purple) */
+  /* =========================
+     Borders
+     ========================= */
+
+  --border: 260 12% 85%;
+  --border-strong: 260 15% 78%;
+
+  /* =========================
+     Brand
+     ========================= */
+
   --primary: 285 45% 32%;
   --primary-foreground: 0 0% 100%;
 
-  /* Surfaces */
-  --secondary: 260 20% 93%;
-  --secondary-foreground: 260 10% 15%;
+  /* =========================
+     UI Tokens
+     ========================= */
 
-  --muted: 260 20% 94%;
-  --accent: 260 20% 91%;
+  --secondary: 260 16% 92%;
+  --accent: 260 16% 90%;
+  --muted: 260 16% 94%;
 
-  /* Borders */
-  --border: 260 15% 88%;
-  --input: 260 15% 88%;
+  /* =========================
+     States
+     ========================= */
 
-  /* Focus */
   --ring: 285 45% 32%;
 
-  --accent-foreground: 260 10% 15%;
+  --destructive: 0 70% 50%;
+  --destructive-foreground: 0 0% 100%;
+
+  /* =========================
+     Challenge Difficulty
+     ========================= */
+
+  --challenge-easy: 120 35% 80%;
+  --challenge-medium: 45 70% 80%;
+  --challenge-hard: 0 60% 80%;
+
+  --challenge-easy-foreground: 120 40% 20%;
+  --challenge-medium-foreground: 45 50% 20%;
+  --challenge-hard-foreground: 0 50% 20%;
+
+  /* =========================
+     Status
+     ========================= */
+
+  --status-draft: 210 35% 80%;
+  --status-published: 140 40% 80%;
+  --status-foreground: 0 0% 20%;
+
+  /* =========================
+     Spacing
+     ========================= */
+
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 24px;
+
+  --card-padding-x: var(--spacing-lg);
+  --card-padding-y: var(--spacing-md);
+  --card-gap: var(--spacing-lg);
 }
 
 @layer base {
@@ -46,5 +105,45 @@
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
+  }
+}
+
+@layer utilities {
+
+  /* Challenge Level Badges */
+  .challenge-easy {
+    background-color: hsl(120, 30%, 85%);
+    color: hsl(120, 40%, 20%);
+  }
+
+  .challenge-medium {
+    background-color: hsl(45, 60%, 85%);
+    color: hsl(45, 40%, 20%);
+  }
+
+  .challenge-hard {
+    background-color: hsl(0, 70%, 85%);
+    color: hsl(0, 50%, 20%);
+  }
+
+  /* Status Badges */
+  .status-draft {
+    background-color: hsl(260, 15%, 80%);
+    color: hsl(260, 10%, 20%);
+  }
+
+  .status-published {
+    background-color: hsl(285, 40%, 80%);
+    color: hsl(285, 45%, 20%);
+  }
+
+  /* General Badge Styles */
+  .badge {
+    border-radius: var(--radius);
+    padding: 0.2rem 0.5rem;
+    font-size: 0.7rem;
+    font-weight: 500;
+    display: inline-block;
+    text-transform: capitalize;
   }
 }
