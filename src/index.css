@@ -110,6 +110,34 @@
 
 @layer utilities {
 
+  /* .typo-display {
+    @apply text-2xl font-semibold;
+  }
+
+  .typo-heading {
+    @apply text-xl font-semibold;
+  }
+
+  .typo-title {
+    @apply text-lg font-semibold;
+  }
+
+  .typo-body {
+    @apply text-sm;
+  }
+
+  .typo-body-sm {
+    @apply text-xs;
+  }
+
+  .typo-label {
+    @apply text-xs font-medium;
+  }
+
+  .typo-caption {
+    @apply text-xs text-muted-foreground;
+  } */
+
   /* Challenge Level Badges */
   .challenge-easy {
     background-color: hsl(120, 30%, 85%);

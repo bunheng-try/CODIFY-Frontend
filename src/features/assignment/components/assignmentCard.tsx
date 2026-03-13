@@ -33,35 +33,40 @@ export const AssignmentCard = ({
       isSelected={isSelect}
       onClick={() => onClick(assignment)}
     >
-      <CardHeader
-        title={assignment.title}
-        actions={
-          showActions ? (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={(e) => {
-                e.stopPropagation()
-                console.log("Open context menu or settings")
-              }}
-            >
-              <MoreVertical />
-            </Button>
-          ) : undefined
-        }
-      />
+      <div className="flex-1 flex flex-col gap-1">
+        <CardHeader
+          title={assignment.title}
+          actions={
+            showActions ? (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  console.log("Open context menu or settings")
+                }}
+              >
+                <MoreVertical />
+              </Button>
+            ) : undefined
+          }
+        />
+        <div>
+          <Badge variant={status === "Published" ? "status-published" : "status-draft"}>
+            {status}
+          </Badge>
+        </div>
 
-      <CardMeta>
-        <span>
-          Due {dueDate}
-        </span>
+        <CardMeta>
+          <span>
+            Due {dueDate}
+          </span>
 
-        <span>{submissions}</span>
+          <span>{submissions}</span>
 
-        <Badge variant={status === "Published" ? "status-published" : "status-draft"}>
-          {status}
-        </Badge>
-      </CardMeta>
+        </CardMeta>
+      </div>
+      
     </Card>
   );
 };

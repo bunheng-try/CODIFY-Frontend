@@ -17,7 +17,7 @@ interface ChallengeCardProps {
   isSelected?: boolean;
   onSelect?: (id: number) => void;
   variant?: "assignment" | "library";
-  index?: number; // used for assignment order
+  index?: number;
 }
 
 export const ChallengeCard = ({

@@ -1,60 +1,80 @@
-import { useState, useEffect } from "react";
-import MainPanel from "@/shared/components/layout/mainPanel/MainPanel";
-import AssignmentHeader from "../components/AssignmentHeader";
 import ChallengeTab from "../components/ChallengesTab";
 import { SettingsTab } from "../components/SettingsTab";
 import { SubmissionsTab } from "../components/SubmissionTab";
-import { useAssignmentTabs } from "../hooks/useMenuTabs";
-import { useClassroomRoute } from "@/features/classes/hooks/useClassroomRoute";
-import { useAssignment, useDeleteAssignment } from "../hooks/useAssignmentQuery";
-import {mockSubmissions } from "@/shared/types/types";
-import type { Assignment } from "../apis/assignment.api";
+import { useAssignmentTabs, type AssignmentTab } from "../hooks/useMenuTabs";
+import { mockSubmissions } from "@/shared/types/types";
+import { AssignmentHeader } from "../components/AssignmentHeader";
+import { type TabItem } from "@/shared/components/menu_tabs/MenuTabs";
+import { Panel, PanelContent } from "@/shared/components/design/Panel";
+import { useAssignmentEditor } from "../hooks/useAssignmentEditor";
 
 const AssignmentEditor = () => {
-  const { activeTab } = useAssignmentTabs();
-  const { classroomId, assignmentId } = useClassroomRoute();
-  const { data: assignment, isLoading } = useAssignment(classroomId || null, assignmentId || null);
-  const {mutate:deleteAssignment} = useDeleteAssignment();
+  const { activeTab, setActiveTab } = useAssignmentTabs();
 
-  const [isEditing, setIsEditing] = useState(false);
-
+  const {
+    assignment,
+    isLoading,
+    title,
+    setTitle,
+    isEditing,
+    setIsEditing,
+    publish,
+    unpublish,
+    deleteAssignment,
+  } = useAssignmentEditor();
 
   if (isLoading) {
-    return <div className="p-6 text-muted-foreground">Loading assignment...</div>;
+    return <div className="p-6">Loading assignment...</div>;
   }
 
-  if (!assignmentId || !assignment) {
-    return <div className="p-6 text-muted-foreground">Select an assignment</div>;
+  if (!assignment) {
+    return <div className="p-6">Select an assignment</div>;
   }
 
-  const handleAssignmentUpdate = (updated: Partial<Assignment>) => {
-    
-  };
-
-  const handleDelete = () => {
-    // Ideally call a mutation to delete the assignment here
-    deleteAssignment({classroomId,assignmentId});
-  };
+  const tabs: TabItem<AssignmentTab>[] = [
+    { key: "challenge", label: "Challenges" },
+    { key: "settings", label: "Settings" },
+    ...(assignment.isPublished
+      ? [{ key: "submission" as AssignmentTab, label: "Submissions" }]
+      : []),
+  ];
 
   return (
-    <MainPanel
-      header={<AssignmentHeader classroomId={classroomId} assignment={assignment} isEditing={isEditing} />}
-      emptyState={<div className="p-6 text-gray-400">No content</div>}
-    >
-      <div className="flex-1 overflow-auto">
-        {activeTab === "challenge" && <ChallengeTab challenges={assignment.codingChallenges} />}
+    <Panel>
+      <AssignmentHeader
+        assignment={assignment}
+        title={title}
+        isEditing={isEditing}
+        onTitleChange={setTitle}
+        onEditStart={() => setIsEditing(true)}
+        onEditDone={() => setIsEditing(false)}
+        onPublish={publish}
+        onUnpublish={unpublish}
+        onDiscard={() => setIsEditing(false)}
+        tabs={tabs}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+      />
+
+      <PanelContent>
+        {activeTab === "challenge" && (
+          <ChallengeTab challenges={assignment.codingChallenges} />
+        )}
+
         {activeTab === "settings" && (
           <SettingsTab
             assignment={assignment}
             isEditing={isEditing}
             onEditChange={setIsEditing}
-            onAssignmentUpdate={handleAssignmentUpdate}
-            onDelete={handleDelete}
+            onDelete={deleteAssignment}
           />
         )}
-        {activeTab === "submission" && <SubmissionsTab submissions={mockSubmissions ?? []} />}
-      </div>
-    </MainPanel>
+
+        {activeTab === "submission" && assignment.isPublished && (
+          <SubmissionsTab submissions={mockSubmissions ?? []} />
+        )}
+      </PanelContent>
+    </Panel>
   );
 };
 

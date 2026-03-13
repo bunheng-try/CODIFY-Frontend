@@ -14,6 +14,10 @@ import { useState } from "react";
 import { getClassroomContextMenu } from "./classContextMenu";
 import { useContextMenu } from "@/shared/components/context-menu/ContextMenuProvider";
 import type { CreateAssignmentDto } from "@/features/assignment/apis/assignment.api";
+import { Panel, PanelContent } from "@/shared/components/design/Panel";
+import { PanelHeader } from "@/shared/components/design/PanelHeader";
+import { GraduationCap, Plus, Settings } from "lucide-react";
+import { Button } from "@/shared/components/ui/button";
 
 const MainBarClassroom = () => {
   const navigate = useNavigate();
@@ -89,32 +93,59 @@ const MainBarClassroom = () => {
 
   return (
     <>
-    <MainBar
-      title={classroom?.name}
-      student={MOCK_STUDENTS.length}
-      openSetting={handleSetting}
-      openStudentList={openStudentList}
-      create={handleCreate}
-    >
-      <div className="flex flex-col gap-2">
-        {isLoading ? (
-          <p>Loading assignments...</p>
-        ) : assignments.length === 0 ? (
-          <p>No assignments found</p>
-        ) : (
-          assignments.slice().sort((a, b) => a.id - b.id).map((a) => (
-            <AssignmentCard
-              key={a.id}
-              assignment={a}
-              isSelect={a.id === assignmentId}
-              onClick={() => navigate(`/classrooms/${classroomId}/assignments/${a.id}`)}
-              totalStudent={67}
-              showActions={true}
-            />
-          ))
-        )}
-      </div>
-      </MainBar>
+      <Panel className="w-full h-full bg-[hsl(var(--surface-2))] border-r">
+        {/* Header */}
+        <PanelHeader
+          topLeft={
+            <h2 className="text-lg font-bold truncate">{classroom?.name}</h2>
+          }
+          topRight={
+            <>
+              <Button variant="ghost" size="icon" onClick={handleSetting}>
+                <Settings className="w-5 h-5" />
+              </Button>
+              <Button variant="ghost" size="icon" onClick={handleCreate}>
+                <Plus className="w-5 h-5 text-[hsl(var(--primary))]" />
+              </Button>
+            </>
+          }
+
+          bottomContent={
+            <div
+              className="flex items-center gap-2 text-sm text-[hsl(var(--muted-foreground))] cursor-pointer hover:text-[hsl(var(--foreground))]"
+              onClick={openStudentList}
+            >
+              <GraduationCap className="w-4 h-4" />
+              <span>{MOCK_STUDENTS.length} Students</span>
+            </div>
+          }
+        />
+
+        {/* Content */}
+        <PanelContent className="flex flex-col gap-2 p-4">
+          {isLoading ? (
+            <p>Loading assignments...</p>
+          ) : assignments.length === 0 ? (
+            <p>No assignments found</p>
+          ) : (
+            assignments
+              .slice()
+              .sort((a, b) => a.id - b.id)
+              .map((a) => (
+                <AssignmentCard
+                  key={a.id}
+                  assignment={a}
+                  isSelect={a.id === assignmentId}
+                  onClick={() =>
+                    navigate(`/classrooms/${classroom?.id}/assignments/${a.id}`)
+                  }
+                  totalStudent={67}
+                  showActions={true}
+                />
+              ))
+          )}
+        </PanelContent>
+      </Panel>
       <ConfirmDialog
         open={confirmDeleteOpen}
         onOpenChange={setConfirmDeleteOpen}
