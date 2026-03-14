@@ -42,4 +42,7 @@ export const memberApi = {
         httpClient.get<Member>(
             `/classrooms/${classroomId}/members/${memberId}`
         ),
+
+    leaveClassroom: (classroomId: number) =>
+        httpClient.post<void, any>(`/classrooms/${classroomId}/leave`, {}),
 };

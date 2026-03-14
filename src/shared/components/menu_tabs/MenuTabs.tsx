@@ -26,7 +26,7 @@ const MenuTabs = <T extends string>({
             onClick={() => onChange(tab.key)}
             className={`
               flex items-center gap-2
-              pb-3 text-sm font-medium transition-colors
+              pb-3 text-sm font-medium transition-colors hover:cursor-pointer
               ${isActive
                 ? "border-b-2 border-[hsl(var(--primary))] text-[hsl(var(--foreground))]"
                 : "text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]"}
