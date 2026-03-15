@@ -11,5 +11,9 @@ export const useClassroomRole = (classroomId: number) => {
         queryKey: QUERY_KEYS.CLASSROOM_ROLE(classroomId),
         queryFn: () => userApi.getClassroomRole(classroomId),
         enabled: !!classroomId,
+
+        
+        // initialData: { userId: 1, name: "Test", role: "ADMIN" }, // test as teacher
+        // initialData: { userId: 1, name: "Test", role: "STUDENT" }, // test as student
     });
 };
