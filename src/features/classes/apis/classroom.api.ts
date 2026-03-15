@@ -7,6 +7,8 @@ export interface Classroom {
     description?: string;
     createdAt: string;
     updatedAt: string;
+    role?: string;
+    student: string;
 }
 
 export const classroomApi = {

@@ -5,13 +5,11 @@ import { useAssignmentClassrooms, useDeleteAssignment } from "@/features/assignm
 import AssignmentCard from "@/shared/components/ui/assignmentCard";
 import { useSelectedClassroom } from "../hooks/useClassroomQuery";
 import { useNavigate } from "react-router-dom"
-import { MOCK_STUDENTS } from "@/features/class/Students.data";
 import { ConfirmDialog } from "@/shared/components/design/dialog";
 import { EditClassDialog } from "./EditClassDialog";
 import { useClassroomActions } from "../hooks/useClassroomAction";
 import { useState } from "react";
 import { getClassroomContextMenu } from "./classContextMenu";
-import { useClassroomRole } from "../hooks/useClassroomRole";
 import { useLeaveClassroom } from "../../class/hooks/useMemberQuery";
 import { useContextMenu } from "@/shared/components/context-menu/ContextMenuProvider";
 import { Users } from "lucide-react";
@@ -25,8 +23,6 @@ const MainBarClassroom = () => {
   const { classroomId, assignmentId } = useClassroomRoute();
   const { data: classroom } = useSelectedClassroom(classroomId);
   const { deleteClassroom, editClassroom } = useClassroomActions();
-  const { data: roleData } = useClassroomRole(classroomId);
-  const role = roleData?.role ?? null;
   const { mutate: leaveClassroom } = useLeaveClassroom();
 
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
@@ -59,12 +55,12 @@ const MainBarClassroom = () => {
   };
 
   const handleSetting = (e: React.MouseEvent) => {
-    if (!classroomId) return;
+    if (!classroomId || !classroom) return;
 
     openMenu({
       x: e.clientX,
       y: e.clientY,
-      items: getClassroomContextMenu(classroomId, role, {
+      items: getClassroomContextMenu(classroomId, classroom.role!, {
         deleteClassroom: handleOpenDelete,
         editClassroom: handleEdit,
         leaveClassroom: handleLeave,
@@ -102,22 +98,22 @@ const MainBarClassroom = () => {
           </div>
         }
         meta={
-          role === "ADMIN" ? (
-            <>
+          classroom?.role === "ADMIN" || classroom?.role === "OWNER" ? (
+            <div className="cursor-pointer flex gap-1 items-center" onClick={() => { navigate(`/classrooms/${classroomId}/students`)}}>
               <Users className="w-4 h-4" />
-              <span>{MOCK_STUDENTS.length} students</span>
-            </>
+              <span>{classroom.student} students</span>
+            </div>
           ) : null
         }
         openSetting={handleSetting}
-        create={role === "ADMIN" ? handleCreate : undefined}
+        create={classroom?.role === "ADMIN" || classroom?.role === "OWNER" ? handleCreate : undefined}
       >
         <div className="border-b mb-4">
           <MenuTabs
             activeTab={activeTab}
             onChange={(tab) => setActiveTab(tab)}
             tabs={
-              role === "STUDENT"
+              classroom?.role === "STUDENT"
                 ? [
                   { key: "Upcoming", label: "Upcoming" },
                   { key: "Past Due", label: "Past Due" },
@@ -140,7 +136,7 @@ const MainBarClassroom = () => {
           ) : (
             assignments
               .filter((a) => {
-                if (role === "STUDENT") {
+                if (classroom?.role === "STUDENT") {
                   const isPast = new Date(a.dueAt) < new Date();
                   if (activeTab === "Upcoming") return !isPast;
                   if (activeTab === "Past Due") return isPast;
@@ -165,7 +161,6 @@ const MainBarClassroom = () => {
                     )
                   }}
                   totalStudent={67}
-                  role={role}
                 />
               ))
           )}
@@ -193,7 +188,7 @@ const MainBarClassroom = () => {
         title="Leave Classroom"
         onConfirm={() => {
           leaveClassroom(classroomId, {
-            onSuccess: () => navigate("/classrooms"),
+            onSuccess: () => navigate("/"),
             onError: (error) => {
               alert(error?.message || "An error occurred while leaving the classroom.");
             }

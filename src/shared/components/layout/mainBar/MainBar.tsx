@@ -22,10 +22,10 @@ export const MainBar: React.FC<MainBarProps> = ({
 }) => (
     <div className="flex flex-col px-8 h-full w-full border-r">
         {/* Header */}
-        <div className="sticky top-0 z-10 border-b py-6">
+        <div className="sticky top-0 z-10 pt-6 ">
             <div className="flex items-start justify-between">
                 <div className="flex flex-col">
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-4 pb-1">
                         {avatar}
                         <h1 className="text-2xl font-bold truncate">{title}</h1>
                     </div>
