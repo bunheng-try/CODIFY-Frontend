@@ -16,8 +16,6 @@ const AssignmentEditor = () => {
   const { classroomId, assignmentId } = useClassroomRoute();
   const { data: assignment, isLoading } = useAssignment(classroomId || null, assignmentId || null);
   const { mutate: deleteAssignment } = useDeleteAssignment();
-  const { data: roleData } = useClassroomRole(classroomId);
-  const isAdmin = roleData?.role === "ADMIN";
 
   const [isEditing, setIsEditing] = useState(false);
 
@@ -42,7 +40,6 @@ const AssignmentEditor = () => {
           classroomId={classroomId}
           assignment={assignment}
           isEditing={isEditing}
-          isAdmin={isAdmin}
         />
       }
       emptyState={<div className="p-6 text-gray-400">No content</div>}
@@ -51,7 +48,7 @@ const AssignmentEditor = () => {
         {activeTab === "challenge" && (
           <ChallengeTab challenges={assignment.codingChallenges} />
         )}
-        {isAdmin && activeTab === "settings" && (
+        { activeTab === "settings" && (
           <SettingsTab
             assignment={assignment}
             isEditing={isEditing}
@@ -60,7 +57,7 @@ const AssignmentEditor = () => {
             onDelete={handleDelete}
           />
         )}
-        {isAdmin && activeTab === "submission" && (
+        { activeTab === "submission" && (
           <SubmissionsTab submissions={mockSubmissions ?? []} />
         )}
       </div>

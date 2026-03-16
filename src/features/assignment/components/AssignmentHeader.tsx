@@ -13,10 +13,9 @@ type Props = {
   classroomId: number
   assignment: Assignment;
   isEditing: boolean;
-  isAdmin: boolean;
 };
 
-const AssignmentHeader = ({ classroomId, assignment, isEditing, isAdmin }: Props) => {
+const AssignmentHeader = ({ classroomId, assignment, isEditing }: Props) => {
   const { activeTab, setActiveTab } = useAssignmentTabs();
   const { mutate: publishAssignment } = usePublishAssignment();
   const { mutate: unpublishAssignment } = useUnPublishAssignment();
@@ -50,12 +49,8 @@ const AssignmentHeader = ({ classroomId, assignment, isEditing, isAdmin }: Props
   // Admin sees Challenges + Settings + Submission 
   const tabs: Tab[] = [
     { key: "challenge", label: "Challenges", icon: <CodeIcon className="w-4 h-4 mr-2" /> },
-    ...(isAdmin ? [
-      { key: "settings" as TabKey, label: "Settings", icon: <SettingsIcon className="w-4 h-4 mr-2" /> },
-    ] : []),
-    ...(isAdmin && showPublishedUI ? [
-      { key: "submission" as TabKey, label: "Submission", icon: <UsersIcon className="w-4 h-4 mr-2" /> },
-    ] : []),
+    { key: "settings" as TabKey, label: "Settings", icon: <SettingsIcon className="w-4 h-4 mr-2" /> },
+    { key: "submission" as TabKey, label: "Submission", icon: <UsersIcon className="w-4 h-4 mr-2" /> },
   ];
 
   const left = (
@@ -79,7 +74,6 @@ const AssignmentHeader = ({ classroomId, assignment, isEditing, isAdmin }: Props
             e.currentTarget.blur();
           }
         }}
-        readOnly={!isAdmin}
         className="
           text-lg font-semibold text-[hsl(var(--foreground))] truncate 
           w-full px-2 py-1 rounded-md 
@@ -91,7 +85,7 @@ const AssignmentHeader = ({ classroomId, assignment, isEditing, isAdmin }: Props
   );
 
   // Student sees nothing on the right
-  const right = isAdmin ? (
+  const right = 
     <>
       {!showPublishedUI ? (
         <>
@@ -110,7 +104,6 @@ const AssignmentHeader = ({ classroomId, assignment, isEditing, isAdmin }: Props
         </>
       )}
     </>
-  ) : null;
 
   return (
     <>

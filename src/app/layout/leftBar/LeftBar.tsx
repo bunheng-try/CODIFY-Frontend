@@ -21,7 +21,6 @@ export function LeftBar() {
   const [openCreate, setOpenCreate] = useState(false)
   const { createClassroom, deleteClassroom, editClassroom } = useClassroomActions();
   const { data: roleData } = useClassroomRole(classroomId ?? 0)
-  const isAdmin = roleData?.role === "ADMIN"
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
   const [classToDelete, setClassToDelete] = useState<number | null>(null)
 
@@ -69,20 +68,17 @@ export function LeftBar() {
 
       
         <div className="flex flex-col gap-1 px-2 py-2">
-          {isAdmin && (
+          
             <LeftBarButton
               icon={<Plus className="h-5 w-5" />}
               tooltip="Create class"
               onClick={() => setOpenCreate(true)}
             />
-          )}
-          {isAdmin && (
             <LeftBarButton
               icon={<Library className="h-5 w-5" />}
               tooltip="Exercise library"
               onClick={() => navigate('challenge-library')}
             />
-          )}
           <LeftBarButton
             icon={<User className="h-5 w-5 text-primary" />}
             tooltip="Profile"

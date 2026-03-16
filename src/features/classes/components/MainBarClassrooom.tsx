@@ -98,7 +98,7 @@ const MainBarClassroom = () => {
           </div>
         }
         meta={
-          classroom?.role === "ADMIN" || classroom?.role === "OWNER" ? (
+          classroom?.role === "TEACHER" || classroom?.role === "OWNER" ? (
             <div className="cursor-pointer flex gap-1 items-center" onClick={() => { navigate(`/classrooms/${classroomId}/students`)}}>
               <Users className="w-4 h-4" />
               <span>{classroom.student} students</span>
@@ -106,7 +106,7 @@ const MainBarClassroom = () => {
           ) : null
         }
         openSetting={handleSetting}
-        create={classroom?.role === "ADMIN" || classroom?.role === "OWNER" ? handleCreate : undefined}
+        create={classroom?.role === "TEACHER" || classroom?.role === "OWNER" ? handleCreate : undefined}
       >
         <div className="border-b mb-4">
           <MenuTabs
@@ -156,9 +156,15 @@ const MainBarClassroom = () => {
                     deleteAssignment({ classroomId, assignmentId: a.id })
                   }}
                   onClick={() => {
-                    navigate(
-                      `/classrooms/${classroomId}/assignments/${a.id}`
-                    )
+                    if (classroom?.role == "OWNER" || classroom?.role == "TEACHER") {
+                      navigate(
+                        `/classrooms/${classroomId}/assignments/${a.id}`
+                      )
+                    } else {
+                      navigate(
+                        `/classrooms/${classroomId}/assignments/${a.id}`
+                      )
+                    }
                   }}
                   totalStudent={67}
                 />
