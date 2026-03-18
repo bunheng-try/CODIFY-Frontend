@@ -5,6 +5,7 @@ import { ButtonsShowroom } from "@/showroom/routes/design/buttons.page";
 import EditorShowroom from "@/showroom/routes/features/codeEditor/Editor.page";
 import { AppShell } from "../layout/AppShell";
 import AssignmentEditor from "@/features/assignment/pages/AssignmentEditorPage";
+import StudentAssignmentPage from "@/features/assignment/pages/StudentAssignmentPage";
 import { ClassroomLayout } from "../layout/ClassroomLayout";
 import { ClassroomHome } from "@/features/classes/components/ClassroomHome";
 import { ProtectedRoute } from "./protectedRoute";
@@ -45,9 +46,13 @@ const router = createBrowserRouter([
             element: <AssignmentEditor />,
           },
           {
+            path: ":classId/assignments/:assignmentId/view",
+            element: <StudentAssignmentPage />,
+          },
+          {
             path: ":classId/students",
             element: <StudentManagement />,
-          }
+          },
         ],
       },
       {
@@ -62,9 +67,9 @@ const router = createBrowserRouter([
             path: "challenges/:challengeId",
             element: <ChallengeEditorPanel />,
           },
-        ]
+        ],
       },
-  ],
+    ],
   },
   {
     path: "classrooms/:classroomId/assignments/:assignmentId/workspace",
