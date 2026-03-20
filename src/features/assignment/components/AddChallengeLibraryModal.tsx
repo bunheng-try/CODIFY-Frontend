@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Search, ChevronDown, X, Plus } from "lucide-react";
-import type { Challenge } from "../types/assignment";
 import { ChallengeCard } from "./ChallengeItemCard";
+import type { Challenge } from "@/features/challenge/apis/challenge.api";
 
 interface Props {
   isOpen: boolean;
@@ -25,10 +25,9 @@ export const AddChallengeLibraryModal = ({
 
   if (!isOpen) return null;
 
-  // Filter Logic
   const filtered = libraryChallenges.filter(c => {
     const matchesSearch = c.title.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesFilter = filterLevel === "All" || c.level === filterLevel;
+    const matchesFilter = filterLevel === "All" || c.difficulty === filterLevel;
     return matchesSearch && matchesFilter;
   });
 

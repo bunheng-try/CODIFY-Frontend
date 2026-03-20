@@ -12,6 +12,7 @@ export const useCreateNewChallenge = () => {
                 description: "",
                 starterCode: "",
                 language: "javascript",
+                difficulty: "MEDIUM"
             });
 
             navigate(`/challenge-library/challenges/${newChallenge.id}`);

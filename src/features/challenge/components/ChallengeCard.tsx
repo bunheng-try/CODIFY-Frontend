@@ -57,15 +57,17 @@ export const ChallengeCard = ({
           />
 
           <div>
-            <Badge variant={challengeLevelMap[challenge.level || "Easy"]}>
-              {challenge.level || "Easy"}
+            <Badge variant={challengeLevelMap[challenge.difficulty || "Easy"]}>
+              {challenge.difficulty || "Easy"}
             </Badge>
           </div>
 
           <CardMeta className="flex flex-wrap gap-3 mt-1 truncate">
+            {/* Compute challenge score from its test case */}
             <CardStatItem icon={Trophy} label={`${challenge.score || 100} Score`} />
             <CardStatItem icon={FileCode} label={challenge.language} />
-            <CardStatItem icon={Tag} label={challenge.topic || "Array"} />
+            
+            {challenge.tag && <CardStatItem icon={Tag} label={challenge.tag} />}
           </CardMeta>
         </div>
       </div>

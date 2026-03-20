@@ -17,7 +17,7 @@ export interface Assignment {
     sectionId: number;
     createdAt: string;
     updatedAt: string;
-    codingChallenges: Challenge[]
+    assignmentChallenges: Challenge[]
 }
 
 export interface CreateAssignmentDto {

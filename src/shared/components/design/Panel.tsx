@@ -11,7 +11,7 @@ export const Panel: React.FC<PanelProps> = ({ children, className }) => {
 };
 
 export const PanelContent: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className }) => (
-  <div className={cn("flex-1 min-h-0 overflow-auto", className)}>{children}</div>
+  <div className={cn("flex-1 min-h-0 overflow-auto p-4 md:p-6", className)}>{children}</div>
 );
 
 export const PanelFooter: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className }) => (

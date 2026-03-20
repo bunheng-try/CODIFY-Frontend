@@ -1,61 +1,60 @@
+"use client";
+
 import { useState } from "react";
-import { Plus, EllipsisVertical } from "lucide-react";
 import { ChallengeCard } from "../components/ChallengeItemCard";
 import { AddChallengeLibraryModal } from "../components/AddChallengeLibraryModal";
-import type { Challenge } from "../types/assignment";
+import { SectionContainer } from "@/shared/components/design/SectionContainer";
+import { Button } from "@/shared/components/ui/button";
 import { useChallenges } from "@/features/challenge/hooks/useChallengeQuery";
-import { useAssignmentAddChallenge } from "../hooks/useAssignmentQuery";
-import { useClassroomRoute } from "@/features/classes/hooks/useClassroomRoute";
-import { useClassroomRole } from "@/features/classes/hooks/useClassroomRole";
+import type { Challenge } from "@/features/challenge/apis/challenge.api";
 
-const ChallengeTab = ({ challenges = [] }: { challenges: Challenge[] }) => {
+interface ChallengeTabProps {
+  challenges: Challenge[];
+  onAddSelected: (selected: Challenge[]) => void;
+  isAdding?: boolean;
+}
+
+const ChallengeTab = ({
+  challenges = [],
+  onAddSelected,
+  isAdding = false,
+}: ChallengeTabProps) => {
   const [libraryOpen, setLibraryOpen] = useState(false);
-
-  const { assignmentId, classroomId } = useClassroomRoute();
-  const { data: roleData } = useClassroomRole(classroomId);
-
-  const { data: challenge } = useChallenges();
-  const { mutate: addChallengeToAssignment } = useAssignmentAddChallenge();
-
-  const addFromLibrary = (selected: Challenge[]) => {
-    const ids = selected.map((c) => c.id);
-    if (!classroomId || !assignmentId) return;
-    addChallengeToAssignment({ classroomId, assignmentId, challengeIds: ids });
-  };
-
+  const { data: libraryChallenges } = useChallenges();
   return (
-    <div className="w-full max-w-5xl mx-auto p-6">
-        <div className="flex justify-end gap-2 mb-6">
-          <button onClick={() => setLibraryOpen(true)} className="w-10 h-10 rounded-xl bg-[#7B57E0] flex items-center justify-center text-white shadow-lg shadow-purple-100 transition-all active:scale-95">
-            <Plus size={22} strokeWidth={3} />
-          </button>
-          <button className="w-10 h-10 rounded-xl border border-gray-200 bg-white flex items-center justify-center text-gray-400">
-            <EllipsisVertical size={20} />
-          </button>
-        </div>
+    <SectionContainer title="Challenges">
+      <div className="flex justify-between items-center mb-4">
+        <p className="text-sm text-gray-500">
+          Add challenges to your assignment.
+        </p>
+        <Button onClick={() => setLibraryOpen(true)} disabled={isAdding}>
+          {isAdding ? "Adding..." : "Add Challenge"}
+        </Button>
+      </div>
 
       <div className="flex flex-col">
         {challenges.length > 0 ? (
           challenges.map((c) => <ChallengeCard key={c.id} challenge={c} />)
         ) : (
           <div className="text-center py-20 border-2 border-dashed border-gray-100 rounded-3xl text-gray-300 font-bold">
-            
-            No challenges added yet. Click + to get started.
+            No challenges added yet. Click "Add Challenge" to get started.
           </div>
         )}
       </div>
 
-      
-        <AddChallengeLibraryModal
-          isOpen={libraryOpen}
-          onClose={() => setLibraryOpen(false)}
-          onCreateNew={() => { console.log("navigate to challenge create") }}
-          onAddSelected={addFromLibrary}
-          libraryChallenges={challenge || []}
-        />
-      
-
-    </div>
+      <AddChallengeLibraryModal
+        isOpen={libraryOpen}
+        onClose={() => setLibraryOpen(false)}
+        onCreateNew={() => {
+          console.log("navigate to challenge create");
+        }}
+        onAddSelected={(selected: Challenge[]) => {
+          onAddSelected(selected);
+          setLibraryOpen(false);
+        }}
+        libraryChallenges={libraryChallenges!}
+      />
+    </SectionContainer>
   );
 };
 

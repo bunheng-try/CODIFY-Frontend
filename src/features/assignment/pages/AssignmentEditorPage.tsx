@@ -1,61 +1,79 @@
-import { useState } from "react";
 import AssignmentHeader from "../components/AssignmentHeader";
 import ChallengeTab from "../components/ChallengesTab";
 import { SettingsTab } from "../components/SettingsTab";
 import { SubmissionsTab } from "../components/SubmissionTab";
 import { useAssignmentTabs } from "../hooks/useMenuTabs";
 import { useClassroomRoute } from "@/features/classes/hooks/useClassroomRoute";
-import { useAssignment, useDeleteAssignment } from "../hooks/useAssignmentQuery";
-import { mockSubmissions } from "@/shared/types/types";
 import { useClassroomRole } from "@/features/classes/hooks/useClassroomRole";
-import type { Assignment } from "../apis/assignment.api";
-import { Panel } from "react-resizable-panels";
-import { PanelContent } from "@/shared/components/design/Panel";
+import { Panel, PanelContent } from "@/shared/components/design/Panel";
+import { useAssignmentEditorDirty } from "../hooks/useAssignmentEditorDirty";
+import { mockSubmissions } from "@/shared/types/types";
+import { useChallengesDirty } from "../hooks/useChallengeDirty";
 
 const AssignmentEditor = () => {
   const { activeTab } = useAssignmentTabs();
   const { classroomId, assignmentId } = useClassroomRoute();
-  const { data: assignment, isLoading } = useAssignment(classroomId || null, assignmentId || null);
-  const { mutate: deleteAssignment } = useDeleteAssignment();
   const { data: roleData } = useClassroomRole(classroomId);
   const isAdmin = roleData?.role === "OWNER";
 
-  const [isEditing, setIsEditing] = useState(false);
+  const {
+    draft,
+    updateField,
+    cancel,
+    save,
+    isDirty,
+    isSaving,
+    isLoading,
+  } = useAssignmentEditorDirty(classroomId, assignmentId);
 
-  if (isLoading) {
+  const {
+    draft: challengeDraft,
+    addSelected: addChallenge,
+    isAdding: isAddingChallenges,
+    hasUnsaved: hasUnsavedChallenge,
+    save: saveChallenge,
+    cancel: cancelChallenge,
+  } = useChallengesDirty(assignmentId, classroomId, draft?.codingChallenges || []);
+
+  if (isLoading || !draft) {
     return <div className="p-6 text-muted-foreground">Loading assignment...</div>;
   }
 
-  if (!assignmentId || !assignment) {
-    return <div className="p-6 text-muted-foreground">Select an assignment</div>;
-  }
 
-  const handleAssignmentUpdate = (updated: Partial<Assignment>) => { };
-
-  const handleDelete = () => {
-    deleteAssignment({ classroomId, assignmentId });
+  const handleCancelAll = () => {
+    cancel();
+    if (hasUnsavedChallenge) cancelChallenge();
   };
+
+  const handleSaveAll = async () => {
+
+    await save();
+    if (hasUnsavedChallenge) saveChallenge(); 
+  };
+
+
 
   return (
     <Panel>
-        <AssignmentHeader
-          classroomId={classroomId}
-          assignment={assignment}
-          isEditing={isEditing}
-        />
+      <AssignmentHeader
+        classroomId={classroomId}
+        assignment={draft}
+        isDirty={isDirty && hasUnsavedChallenge}
+        updateField={updateField}
+        save={handleSaveAll}
+        cancel={handleCancelAll}
+
+      />
 
       <PanelContent>
         {activeTab === "challenge" && (
-          <ChallengeTab challenges={assignment.codingChallenges} />
+          <ChallengeTab challenges={draft.codingChallenges} onAddSelected={addChallenge} />
         )}
 
         {isAdmin && activeTab === "settings" && (
           <SettingsTab
-            assignment={assignment}
-            isEditing={isEditing}
-            onEditChange={setIsEditing}
-            onAssignmentUpdate={handleAssignmentUpdate}
-            onDelete={handleDelete}
+            draft={draft} 
+            updateField={updateField}
           />
         )}
 

@@ -9,6 +9,7 @@ interface EditableFieldProps {
     multiline?: boolean;
     icon?: ReactNode;
     showDirtyIndicator?: boolean;
+    type?: string;
 }
 
 export const EditableField: React.FC<EditableFieldProps> = ({
@@ -19,6 +20,7 @@ export const EditableField: React.FC<EditableFieldProps> = ({
     multiline = false,
     icon,
     showDirtyIndicator = true,
+    type = "text",
 }) => {
     const [localValue, setLocalValue] = useState(value);
     const [isDirty, setIsDirty] = useState(false);
@@ -54,7 +56,7 @@ export const EditableField: React.FC<EditableFieldProps> = ({
                 />
             ) : (
                 <input
-                    type="text"
+                    type={type}
                     value={localValue}
                     onChange={(e) => handleChange(e.target.value)}
                     placeholder={placeholder}

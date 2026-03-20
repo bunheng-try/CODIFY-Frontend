@@ -61,8 +61,7 @@ export default function ChallengeEditorPanel() {
     };
 
     const handleSaveAll = async () => {
-        console.log("is testcase dirty", isTestCaseDirty)
-        console.log("has testcase dirty", hasDirtyTestCases)
+
         await save();
         if (testCaseDraft?.length) {
             for (const tc of testCaseDraft) {
@@ -91,7 +90,7 @@ export default function ChallengeEditorPanel() {
                 tabs={<MenuTabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />}
             />
 
-            <PanelContent className="p-4 md:p-6">
+            <PanelContent>
                 {activeTab === "overview" && <OverviewTab draft={draft} updateField={updateField} />}
                 {activeTab === "starter" && <StarterCodeTab draft={draft} updateField={updateField} />}
                 {activeTab === "testcases" && testCaseDraft && (

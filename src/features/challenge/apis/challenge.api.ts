@@ -4,15 +4,23 @@ export type Challenge = {
   description: string;
   starterCode: string;
   language: string;
+  difficulty: ChallengeLevel;
+  tagId?: number;
+  tag?: string;
   createdAt: string;
   updatedAt: string;
 };
+
+
+export type ChallengeLevel = "EASY" | "MEDIUM" | "HARD";
 
 export type ChallengeDto = {
   title: string;
   description: string;
   starterCode: string;
   language: string;
+  difficulty: ChallengeLevel;
+  tagId?: number;
 };
 
 import { httpClient } from "@/app/services/httpClient";

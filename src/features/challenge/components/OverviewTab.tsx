@@ -1,4 +1,4 @@
-import type { ChallengeDto } from "../apis/challenge.api";
+import type { ChallengeDto, ChallengeLevel } from "../apis/challenge.api";
 import { SectionContainer } from "@/shared/components/design/SectionContainer";
 import { LabeledSection } from "@/shared/components/design/LabeledSection";
 import { EditableField } from "@/shared/components/design/EditableField";
@@ -9,8 +9,10 @@ interface Props {
 }
 
 export default function OverviewTab({ draft, updateField }: Props) {
+    const difficultyOptions: ChallengeLevel[] = ["EASY", "MEDIUM", "HARD"];
+
     return (
-        <div className="max-w-4xl space-y-8">
+        <div className="space-y-8">
 
             {/* ---------- BASIC INFO SECTION ---------- */}
             <SectionContainer title="Basic Information">
@@ -47,6 +49,32 @@ export default function OverviewTab({ draft, updateField }: Props) {
                         <option value="cpp">C++</option>
                     </select>
                 </LabeledSection>
+
+                <LabeledSection label="Difficulty" className="mt-4">
+                    <select
+                        value={draft.difficulty}
+                        onChange={(e) => updateField("difficulty", e.target.value as ChallengeLevel)}
+                        className="
+                            w-full
+                            rounded-md
+                            border
+                            border-[hsl(var(--border))]
+                            bg-[hsl(var(--background))]
+                            px-3 py-2
+                            text-sm
+                            focus:outline-none
+                            focus:ring-2
+                            focus:ring-[hsl(var(--primary))]
+                        "
+                    >
+                        <option value="">Select difficulty</option>
+                        {difficultyOptions.map((level) => (
+                            <option key={level} value={level}>
+                                {level.charAt(0) + level.slice(1).toLowerCase()}
+                            </option>
+                        ))}
+                    </select>
+                </LabeledSection>
             </SectionContainer>
 
             {/* ---------- DESCRIPTION SECTION ---------- */}
@@ -57,7 +85,7 @@ export default function OverviewTab({ draft, updateField }: Props) {
                         onChange={(val) => updateField("description", val)}
                         placeholder="Write the full problem statement..."
                         multiline
-                        className="h-40" // sets a fixed height like rows=10
+                        className="min-h-40"
                     />
                 </LabeledSection>
             </SectionContainer>

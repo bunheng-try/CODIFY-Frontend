@@ -17,7 +17,7 @@ function ChallengeWorkspace() {
   const { classroomId, assignmentId } = useParams();
   const assignmentQuery = useAssignment(Number(classroomId), Number(assignmentId));
   const assignment = assignmentQuery.data;
-  const challenges = assignment?.codingChallenges ?? [];
+  const challenges = assignment?.assignmentChallenges ?? [];
 
   const { currentChallengeId, setCurrentChallenge } = useWorkspaceStore();
   const setStarterCode = useWorkspaceStore((s) => s.setStarterCode);
