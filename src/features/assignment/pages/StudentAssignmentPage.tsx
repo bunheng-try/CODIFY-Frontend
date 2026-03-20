@@ -58,8 +58,8 @@ const StudentAssignmentPage = () => {
       })
     : "—";
 
-  const hasNoChallenges = assignment.codingChallenges.length === 0;
-  const firstChallengeId = assignment.codingChallenges[0]?.id;
+  const hasNoChallenges = assignment.assignmentChallenges.length === 0;
+  const firstChallengeId = assignment.assignmentChallenges[0]?.id;
 
   return (
     <Panel>
@@ -94,7 +94,7 @@ const StudentAssignmentPage = () => {
             </div>
             <div className="flex justify-between py-2 text-sm">
               <span className="text-muted-foreground">Total Points</span>
-              <span>{assignment.codingChallenges.length * 25}</span>
+              <span>{assignment.assignmentChallenges.length * 25}</span>
             </div>
           </div>
         </div>
@@ -109,7 +109,7 @@ const StudentAssignmentPage = () => {
             </div>
           ) : (
             <div className="flex flex-col gap-2">
-              {assignment.codingChallenges.map((challenge, index) => (
+                {assignment.assignmentChallenges.map((challenge, index) => (
                 <StudentChallengeRow
                   key={challenge.id}
                   index={index + 1}
