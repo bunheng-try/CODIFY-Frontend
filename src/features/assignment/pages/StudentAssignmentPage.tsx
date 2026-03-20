@@ -16,9 +16,7 @@ const StudentAssignmentPage = () => {
   const { data: assignment, isLoading, isError } = useAssignment(classroomId, assignId);
 
   const handleStart = (challengeId: number) => {
-    navigate(
-      `/classrooms/${classId}/assignments/${assignmentId}/workspace/${challengeId}`
-    );
+    navigate(`/classrooms/${classId}/assignments/${assignmentId}/workspace/${challengeId}`);
   };
 
   if (isLoading) {
@@ -109,21 +107,12 @@ const StudentAssignmentPage = () => {
             </div>
           ) : (
             <div className="flex flex-col gap-2">
-<<<<<<< Updated upstream
               {assignment.codingChallenges.map((challenge, index) => (
-                <StudentChallengeRow
-=======
-              {assignment.assignmentChallenges.map((challenge, index) => (
                 <ChallengeCard
->>>>>>> Stashed changes
                   key={challenge.id}
                   challenge={challenge}
-<<<<<<< Updated upstream
-                  onStart={() => handleStart(challenge.id)}
-=======
                   variant="assignment"
                   index={index + 1}
->>>>>>> Stashed changes
                 />
               ))}
             </div>
