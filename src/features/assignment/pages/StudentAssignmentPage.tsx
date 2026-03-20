@@ -15,9 +15,9 @@ const StudentAssignmentPage = () => {
 
   const { data: assignment, isLoading, isError } = useAssignment(classroomId, assignId);
 
-  const handleStart = (challengeId: number) => {
+  const handleStart = () => {
     navigate(
-      `/classrooms/${classId}/assignments/${assignmentId}/workspace/${challengeId}`
+      `/classrooms/${classId}/assignments/${assignmentId}/workspace`
     );
   };
 
@@ -69,7 +69,7 @@ const StudentAssignmentPage = () => {
             left={<h2 className="text-lg font-semibold">{assignment.title}</h2>}
             right={
               firstChallengeId && (
-                <ButtonPrimary onClick={() => handleStart(firstChallengeId)}>
+                <ButtonPrimary onClick={() => handleStart()}>
                   Start
                 </ButtonPrimary>
               )
@@ -114,7 +114,7 @@ const StudentAssignmentPage = () => {
                   key={challenge.id}
                   index={index + 1}
                   challenge={challenge}
-                  onStart={() => handleStart(challenge.id)}
+                  onStart={() => handleStart()}
                 />
               ))}
             </div>
