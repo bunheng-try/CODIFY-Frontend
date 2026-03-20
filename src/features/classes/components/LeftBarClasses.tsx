@@ -6,6 +6,8 @@ import { getClassroomContextMenu } from "@/features/classes/components/classCont
 import type { Classroom } from "../apis/classroom.api"
 import { LeftBarButton } from "@/app/layout/leftBar/LeftBarButton"
 import { AllClassesDialog } from "./AllClassesDialog"
+import { useClassroomRole } from "../hooks/useClassroomRole"
+import ClassroomItem from "./ClassroomItem"
 
 type Props = {
     classes: Classroom[]
@@ -22,6 +24,7 @@ export function LeftBarClasses({ classes, selectedClassroomId, onDelete, onEdit 
     const listRef = useRef<HTMLDivElement>(null)
     const [visibleCount, setVisibleCount] = useState(classes.length)
     const [openAll, setOpenAll] = useState(false)
+    const { data: roleData } = useClassroomRole(selectedClassroomId ?? 0);
 
     const orderedClasses = [
         ...classes.filter((c) => c.id === selectedClassroomId),
@@ -44,24 +47,7 @@ export function LeftBarClasses({ classes, selectedClassroomId, onDelete, onEdit 
         <>
             <div ref={listRef} className="flex flex-col gap-1 px-2 py-2 overflow-hidden flex-1">
                 {visibleClasses.map((c) => (
-                    <LeftBarButton
-                        key={c.id}
-                        icon={<Users className="h-5 w-5" />}
-                        tooltip={c.name}
-                        active={c.id === selectedClassroomId}
-                        onClick={() => navigate(`/classrooms/${c.id}`)}
-                        onContextMenu={(e) => {
-                            e.preventDefault()
-                            openMenu({
-                                x: e.clientX,
-                                y: e.clientY,
-                                items: getClassroomContextMenu(c.id, {
-                                    deleteClassroom: onDelete,
-                                    editClassroom: onEdit,
-                                }),
-                            })
-                        }}
-                    />
+                    <ClassroomItem c={c} selectedClassroomId={c.id} onDelete={onDelete} onEdit={onEdit} />
                 ))}
             </div>
 

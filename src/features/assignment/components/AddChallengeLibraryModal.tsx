@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Search, ChevronDown, X, Plus } from "lucide-react";
-import type { Challenge } from "../types/assignment";
-import { ChallengeCard } from "@/features/challenge/components/ChallengeCard";
+import { ChallengeCard } from "./ChallengeItemCard";
+import type { Challenge } from "@/features/challenge/apis/challenge.api";
 
 interface Props {
   isOpen: boolean;
@@ -21,25 +21,24 @@ export const AddChallengeLibraryModal = ({
 }: Props) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterLevel, setFilterLevel] = useState("All");
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   if (!isOpen) return null;
 
-  // Filter Logic
   const filtered = libraryChallenges.filter(c => {
     const matchesSearch = c.title.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesFilter = filterLevel === "All" || c.level === filterLevel;
+    const matchesFilter = filterLevel === "All" || c.difficulty === filterLevel;
     return matchesSearch && matchesFilter;
   });
 
-  const toggleSelect = (id: number) => {
+  const toggleSelect = (id: string) => {
     setSelectedIds(prev => 
       prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
     );
   };
 
   const handleConfirm = () => {
-    const selected = libraryChallenges.filter(c => selectedIds.includes(c.id));
+    const selected = libraryChallenges.filter(c => selectedIds.includes(c.id.toString()));
 
     if (selected.length > 0) {
       onAddSelected(selected);
@@ -115,7 +114,8 @@ export const AddChallengeLibraryModal = ({
                 key={c.id} 
                 challenge={c} 
                 showDescription 
-                isSelected={selectedIds.includes(c.id)}
+                selectable 
+                isSelected={selectedIds.includes(c.id.toString())}
                 onSelect={toggleSelect}
               />
             ))

@@ -6,6 +6,7 @@ type User = { id: number; name: string; email: string };
 type AuthResponse = { access_token: string; user: User };
 
 export const authApi = {
+
   login: async (email: string, password: string) => {
     try {
       console.log("Logging in:", { email, password });
@@ -13,8 +14,13 @@ export const authApi = {
         "/auth/login",
         { email, password }
       );
-      useAuthStore.getState().setAuth(data.user, data.access_token);
-      return data.user;
+      useAuthStore.getState().setAuth(null, data.access_token);
+
+      const user = await httpClient.get<User>("/users/me");
+
+      useAuthStore.getState().setAuth(user, data.access_token);
+
+      return user;
     } catch (err: any) {
       console.error("Login failed:", err.message);
       throw err;
@@ -27,8 +33,13 @@ export const authApi = {
         "/auth/signup",
         { name, email, password }
       );
-      useAuthStore.getState().setAuth(data.user, data.access_token);
-      return data.user;
+      useAuthStore.getState().setAuth(null, data.access_token);
+
+      const user = await httpClient.get<User>("/users/me");
+
+      useAuthStore.getState().setAuth(user, data.access_token);
+
+      return user;
     } catch (err: any) {
       console.error("Signup failed:", err.message);
       throw err;

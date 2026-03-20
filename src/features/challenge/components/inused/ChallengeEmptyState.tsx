@@ -26,7 +26,6 @@ export const ChallengeEmptyState = ({ onCreate }: ChallengeEmptyStateProps) => {
         </p>
       </div>
 
-      {/* CTA — no size prop, ButtonPrimary doesn't support it */}
       <ButtonPrimary onClick={onCreate}>
         + Create Challenge
       </ButtonPrimary>

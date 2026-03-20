@@ -51,13 +51,13 @@ const StudentAssignmentPage = () => {
 
   const formattedDue = assignment.dueAt
     ? new Date(assignment.dueAt).toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-      })
+      month: "short",
+      day: "numeric",
+    })
     : "—";
 
-  const hasNoChallenges = assignment.codingChallenges.length === 0;
-  const firstChallengeId = assignment.codingChallenges[0]?.id;
+  const hasNoChallenges = assignment.assignmentChallenges.length === 0;
+  const firstChallengeId = assignment.assignmentChallenges[0]?.id;
 
   return (
     <Panel>
@@ -67,7 +67,7 @@ const StudentAssignmentPage = () => {
             left={<h2 className="text-lg font-semibold">{assignment.title}</h2>}
             right={
               firstChallengeId && (
-                <ButtonPrimary onClick={() => handleStart(firstChallengeId)}>
+                <ButtonPrimary onClick={() => handleStart()}>
                   Start
                 </ButtonPrimary>
               )
@@ -92,7 +92,7 @@ const StudentAssignmentPage = () => {
             </div>
             <div className="flex justify-between py-2 text-sm">
               <span className="text-muted-foreground">Total Points</span>
-              <span>{assignment.codingChallenges.length * 25}</span>
+              <span>{assignment.assignmentChallenges.length * 25}</span>
             </div>
           </div>
         </div>

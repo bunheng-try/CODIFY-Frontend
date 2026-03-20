@@ -8,24 +8,19 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground",
-        secondary: "bg-secondary text-secondary-foreground",
-        destructive: "bg-destructive text-white",
-        outline: "border border-border text-foreground bg-transparent",
-
+        default: "bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))]",
+        secondary: "bg-[hsl(var(--secondary))] text-[hsl(var(--secondary-foreground))]",
+        destructive: "bg-[hsl(var(--destructive))] text-[hsl(var(--destructive-foreground))]",
         "challenge-easy": "bg-[hsl(var(--challenge-easy))] text-[hsl(var(--challenge-easy-foreground))]",
         "challenge-medium": "bg-[hsl(var(--challenge-medium))] text-[hsl(var(--challenge-medium-foreground))]",
         "challenge-hard": "bg-[hsl(var(--challenge-hard))] text-[hsl(var(--challenge-hard-foreground))]",
         "challenge-expert": "bg-[hsl(var(--challenge-expert))] text-[hsl(var(--challenge-expert-foreground))]",
-
         "status-draft": "bg-[hsl(var(--status-draft))] text-[hsl(var(--status-foreground))]",
         "status-published": "bg-[hsl(var(--status-published))] text-[hsl(var(--status-foreground))]",
         "status-archived": "bg-[hsl(var(--status-archived))] text-[hsl(var(--status-foreground))]",
       },
     },
-    defaultVariants: {
-      variant: "default",
-    },
+    defaultVariants: { variant: "default" },
   }
 );
 

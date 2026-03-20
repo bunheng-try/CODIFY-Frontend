@@ -15,8 +15,7 @@ export const useCreateAssignmentForm = (classroomId: number) => {
     isError,
   } = useCreateAssignment(classroomId);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (onSuccessCallback?: () => void) => {
     if (!title.trim()) return;
 
     const dto: CreateAssignmentDto = {
@@ -33,7 +32,7 @@ export const useCreateAssignmentForm = (classroomId: number) => {
       onSuccess: () => {
         setTitle("");
         setDescription("");
-        // setCreateDialogOpen(false);
+        onSuccessCallback?.();
       },
     });
   };

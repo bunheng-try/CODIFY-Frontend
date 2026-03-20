@@ -70,7 +70,7 @@ export const useUpdateTestCase = () => {
                 updatedTestCase
             );
             queryClient.invalidateQueries({
-                queryKey: QUERY_KEYS.TESTCASES(updatedTestCase.challenge_id),
+                queryKey: QUERY_KEYS.TESTCASES(updatedTestCase.challengeId),
             });
         },
     });

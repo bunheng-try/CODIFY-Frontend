@@ -1,15 +1,18 @@
 import { ResizablePanel, ResizablePanelContainer, ResizablePanelDivider } from "@/shared/components/layout/ResizablePanel";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import { ChallengeLibraryBar } from "../components/ChallengeLibraryBar";
-import { useState } from "react";
-import ChallengeEditorPanel from "./ChallengeEditorPanel";
+import { useCreateNewChallenge } from "../hooks/useCreateChallenge";
 
 export const ChallengeLibraryPage = () => {
-    const [creatingChallenge, setCreatingChallenge] = useState(false);
-    const [editingChallengeId, setEditingChallengeId] = useState<number | null>(null);
+    const { isCreating, createNewChallenge } = useCreateNewChallenge();
 
-    const handleEdit = (id: number) => {
-        setEditingChallengeId(id);
+    const handleCreateChallenge = async () => {
+        console.log("creating")
+        try {
+            await createNewChallenge();
+        } catch (err) {
+            console.error("Failed to create challenge:", err);
+        }
     };
 
     return (
@@ -18,7 +21,7 @@ export const ChallengeLibraryPage = () => {
             {/* MAIN BAR */}
             <ResizablePanel defaultSize={35} minSize={25} maxSize={45}>
                 <ChallengeLibraryBar
-                    onCreateChallenge={() => setCreatingChallenge(true)}
+                    onCreateChallenge={handleCreateChallenge}
                 />
             </ResizablePanel>
 
@@ -26,19 +29,12 @@ export const ChallengeLibraryPage = () => {
 
             {/* MAIN PANEL */}
             <ResizablePanel defaultSize={65} minSize={55} maxSize={75}>
-                {creatingChallenge ? (
-                    <ChallengeEditorPanel
-                        mode="create"
-                        onClose={() => setCreatingChallenge(false)}
-                    />
-                ) : editingChallengeId ? (
-                    <ChallengeEditorPanel
-                        mode="edit"
-                        challengeId={editingChallengeId}
-                        onClose={() => setEditingChallengeId(null)}
-                    />
+                {isCreating ? (
+                    <div className="flex items-center justify-center h-full text-gray-500 text-sm">
+                        Creating new challenge...
+                    </div>
                 ) : (
-                    <Outlet context={{ onEdit: handleEdit }} />
+                    <Outlet />
                 )}
             </ResizablePanel>
 

@@ -38,10 +38,10 @@ const MenuTabs = <T extends string>({
     <div
       ref={containerRef}
       className={cn(
-        "self-start relative flex gap-6 mt-4 -mb-[var(--card-padding-x)] overflow-x-auto whitespace-nowrap",
+        "self-start relative flex gap-5 mt-4 -mb-[var(--card-padding-x)] overflow-x-auto whitespace-nowrap",
         className
       )}
-      style={{ justifyContent: "flex-start" }} // flex-start alignment
+      style={{ justifyContent: "flex-start" }}
     >
       {tabs.map((tab) => {
         const isActive = tab.key === activeTab;
@@ -53,8 +53,7 @@ const MenuTabs = <T extends string>({
             className={cn(
               "flex items-center gap-2 pb-3 px-1 text-sm font-medium transition-colors truncate",
               isActive
-                ? "text-[hsl(var(--foreground))]"
-                : "text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]"
+                ? "typo-tab-active" : "typo-tab-inactive"
             )}
           >
             {tab.icon}
@@ -64,7 +63,7 @@ const MenuTabs = <T extends string>({
       })}
 
       <span
-        className="absolute bottom-0 h-[2px] bg-[hsl(var(--primary))] rounded transition-all duration-300"
+        className="absolute bottom-1 h-[2px] bg-[hsl(var(--primary))] rounded transition-all duration-300"
         style={{
           left: underlineStyle.left,
           width: underlineStyle.width,

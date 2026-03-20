@@ -1,6 +1,6 @@
 // hooks/useMemberQuery.ts
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { memberApi, type Member, type AddMemberDto, type MemberRoleDto, type AddMembersRequest } from "../apis/member.api";
+import { memberApi, type Member, type MemberRoleDto, type AddMembersRequest } from "../apis/member.api";
 
 // Query keys
 export const QUERY_KEYS = {
@@ -37,13 +37,13 @@ export const useMembers = (classroomId: number | null) =>
 export const useAddMember = (classroomId: number | null) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (dto: AddMembersRequest) => { 
+    mutationFn: (dto: AddMembersRequest) => {
       if (!classroomId) throw new Error("No classroom selected");
       return memberApi.addMember(classroomId, dto);
     },
     onSuccess: () => {
       if (!classroomId) return;
-      queryClient.invalidateQueries({queryKey: QUERY_KEYS.MEMBERS(classroomId)});
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.MEMBERS(classroomId) });
     },
   });
 };
@@ -58,8 +58,8 @@ export const useRemoveMember = (classroomId: number | null) => {
     },
     onSuccess: (_, userId) => {
       if (!classroomId) return;
-      queryClient.invalidateQueries({queryKey: QUERY_KEYS.MEMBERS(classroomId)});
-      queryClient.removeQueries({queryKey: QUERY_KEYS.MEMBER(classroomId, userId)});
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.MEMBERS(classroomId) });
+      queryClient.removeQueries({ queryKey: QUERY_KEYS.MEMBER(classroomId, userId) });
     },
   });
 };
@@ -74,8 +74,21 @@ export const useChangeMemberRole = (classroomId: number | null) => {
     },
     onSuccess: (_, { userId }) => {
       if (!classroomId) return;
-      queryClient.invalidateQueries({queryKey: QUERY_KEYS.MEMBERS(classroomId)});
-      queryClient.invalidateQueries({queryKey: QUERY_KEYS.MEMBER(classroomId, userId)});
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.MEMBERS(classroomId) });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.MEMBER(classroomId, userId) });
+    },
+  });
+};
+
+// Leave classroom
+export const useLeaveClassroom = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (classroomId: number) => {
+      return memberApi.leaveClassroom(classroomId);
+    },
+    onSuccess: (_, classroomId) => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.MEMBERS(classroomId) });
     },
   });
 };

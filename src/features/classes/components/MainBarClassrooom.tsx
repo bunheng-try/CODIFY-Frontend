@@ -1,134 +1,160 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-import { MainBar } from "@/shared/components/layout/MainBar";
-import { useClassroomRoute } from "@/features/classes/hooks/useClassroomRoute";
-import { useAssignmentClassrooms, useCreateAssignment, useDeleteAssignment } from "@/features/assignment/hooks/useAssignmentQuery";
-import { AssignmentCard } from "@/features/assignment/components/assignmentCard";
-import { useSelectedClassroom } from "../hooks/useClassroomQuery";
-import type {  AssignmentDto } from "@/shared/types/types";
-import { useNavigate} from "react-router-dom"
-import { MOCK_STUDENTS } from "@/features/class/Students.data";
+import { PanelHeader } from "@/shared/components/design/PanelHeader";
+import MenuTabs from "@/shared/components/menu_tabs/MenuTabs";
+import { AssignmentCard } from "@/features/assignment/components/AssignmentCard";
 import { ConfirmDialog } from "@/shared/components/design/dialog";
 import { EditClassDialog } from "./EditClassDialog";
+import { CreateAssignmentDialog } from "@/features/assignment/components/CreateAssignmentDialog";
+import { useClassroomRoute } from "@/features/classes/hooks/useClassroomRoute";
+import { useAssignmentClassrooms, useDeleteAssignment } from "@/features/assignment/hooks/useAssignmentQuery";
+import { useSelectedClassroom } from "../hooks/useClassroomQuery";
 import { useClassroomActions } from "../hooks/useClassroomAction";
-import { useState } from "react";
-import { getClassroomContextMenu } from "./classContextMenu";
+import { useLeaveClassroom } from "../../class/hooks/useMemberQuery";
 import { useContextMenu } from "@/shared/components/context-menu/ContextMenuProvider";
-import type { CreateAssignmentDto } from "@/features/assignment/apis/assignment.api";
-import { Panel, PanelContent } from "@/shared/components/design/Panel";
-import { PanelHeader } from "@/shared/components/design/PanelHeader";
-import { GraduationCap, Plus, Settings } from "lucide-react";
+import { GraduationCap, Plus, Settings, Users } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
+import { MOCK_STUDENTS } from "@/features/class/Students.data";
+import { getClassroomContextMenu } from "./classContextMenu";
+import { Panel, PanelContent } from "@/shared/components/design/Panel";
 
 const MainBarClassroom = () => {
   const navigate = useNavigate();
-  const { openMenu } = useContextMenu()
-  
-  const { classroomId,assignmentId } = useClassroomRoute();
-  const { data: classroom} = useSelectedClassroom(classroomId);
-  const { mutate: createAssignment } = useCreateAssignment(classroomId);
+  const { classroomId, assignmentId } = useClassroomRoute();
+  const { data: classroom } = useSelectedClassroom(classroomId);
   const { deleteClassroom, editClassroom } = useClassroomActions();
-  
-  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
-  const [classToDelete, setClassToDelete] = useState<number | null>(null)
-  const {mutate:deleteAssignment}=useDeleteAssignment();
+  const { mutate: deleteAssignment } = useDeleteAssignment();
+  const { mutate: leaveClassroom } = useLeaveClassroom();
+  const { openMenu, closeMenu } = useContextMenu();
 
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const [confirmLeaveOpen, setConfirmLeaveOpen] = useState(false);
+  const [classToDelete, setClassToDelete] = useState<number | null>(null);
+  const [activeTab, setActiveTab] = useState<string>(
+    classroom?.role === "STUDENT" ? "Upcoming" : "All"
+  );
   const [openEdit, setOpenEdit] = useState(false);
-    const [selectedClass, setSelectedClass] = useState<{
-    id: number;
-    name: string;
-  } | null>(null);
+  const [openCreate, setOpenCreate] = useState(false);
+  const [selectedClass, setSelectedClass] = useState<{ id: number; name: string } | null>(null);
 
-  const { data: assignments = [], isLoading } =
-    useAssignmentClassrooms(classroomId);
+  const { data: assignments = [], isLoading } = useAssignmentClassrooms(classroomId);
 
-  const openStudentList = () => {
-    navigate(`/classrooms/${classroomId}/students`)
-  };
-
+  // --- Handlers ---
   const handleSetting = (e: React.MouseEvent) => {
-    if (!classroomId) return;
+    if (!classroomId || !classroom) return;
 
     openMenu({
       x: e.clientX,
       y: e.clientY,
-      items: getClassroomContextMenu(classroomId, {
+      items: getClassroomContextMenu(classroomId, classroom.role!, {
         deleteClassroom: handleOpenDelete,
         editClassroom: handleEdit,
+        leaveClassroom: handleLeave,
+        manageMembers: handleManageMembers,
       }),
     });
   };
 
-
-  const handleCreate = async () => {
-    // TODO - Create Assignment
-
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1); // add 1 day
-    tomorrow.setHours(23, 59, 0, 0);
-
-    if(classroomId==null) return;
-    
-    const newAssignmentPayload: CreateAssignmentDto = {
-      classroomId: classroomId,
-      title: "New Assignment",
-      dueAt: tomorrow.toISOString(),
-      description:"",
-      position:0
-    };
-
-    createAssignment(newAssignmentPayload)
+  const handleOpenDelete = (id: number) => {
+    closeMenu();
+    setClassToDelete(id);
+    setConfirmDeleteOpen(true);
   };
 
-  const handleEdit = (classroomId: number) => {
-    const cls = classroom
-    if (!cls) return;
-    setSelectedClass({ id: classroomId, name: cls.name });
+  const handleLeave = () => {
+    closeMenu();
+    setConfirmLeaveOpen(true);
+  };
+
+  const handleEdit = (id: number) => {
+    closeMenu();
+    if (!classroom) return;
+    setSelectedClass({ id, name: classroom.name });
     setOpenEdit(true);
   };
 
-  const handleOpenDelete = (id: number) => {
-    setClassToDelete(id)
-    setConfirmDeleteOpen(true)
-  }
+  const handleManageMembers = (id: number) => {
+    closeMenu();
+    navigate(`/classrooms/${id}/students`);
+  };
+
+  const handleCreate = () => setOpenCreate(true);
+
+  const filteredAssignments = assignments.filter((a) => {
+    if (!classroom) return true;
+
+    if (classroom.role === "STUDENT") {
+      const isPast = new Date(a.dueAt) < new Date();
+      if (activeTab === "Upcoming") return !isPast;
+      if (activeTab === "Past Due") return isPast;
+      // if (activeTab === "Completed") return a.isSubmitted;
+    } else {
+      if (activeTab === "Active") return a.isPublished;
+      if (activeTab === "Draft") return !a.isPublished;
+      return true;
+    }
+  });
+
+  const tabs = classroom?.role === "STUDENT"
+    ? [
+      { key: "Upcoming", label: "Upcoming" },
+      { key: "Past Due", label: "Past Due" },
+      { key: "Completed", label: "Completed" },
+    ]
+    : [
+      { key: "All", label: "All" },
+      { key: "Active", label: "Active" },
+      { key: "Draft", label: "Draft" },
+    ];
 
   return (
     <>
-      <Panel className="w-full h-full bg-[hsl(var(--surface-2))] border-r">
-        {/* Header */}
+      <Panel className="h-full w-full">
         <PanelHeader
           topLeft={
-            <h2 className="text-lg font-bold truncate">{classroom?.name}</h2>
+            <>
+              <div className="flex items-center justify-center min-w-11  min-h-11 bg-[hsl(var(--primary))] rounded-lg text-white font-bold text-lg">
+                {classroom?.name?.substring(0, 2).toUpperCase()}
+              </div>
+              <h2 className="typo-title truncate">{classroom?.name}</h2>
+            </>
           }
           topRight={
             <>
               <Button variant="ghost" size="icon" onClick={handleSetting}>
                 <Settings className="w-5 h-5" />
               </Button>
-              <Button variant="ghost" size="icon" onClick={handleCreate}>
-                <Plus className="w-5 h-5 text-[hsl(var(--primary))]" />
-              </Button>
+              {(classroom?.role === "ADMIN" || classroom?.role === "OWNER") && (
+                <Button variant="ghost" size="icon" onClick={handleCreate}>
+                  <Plus className="w-5 h-5 text-[hsl(var(--primary))]" />
+                </Button>
+              )}
             </>
           }
-
           bottomContent={
             <div
-              className="flex items-center gap-2 text-sm text-[hsl(var(--muted-foreground))] cursor-pointer hover:text-[hsl(var(--foreground))]"
-              onClick={openStudentList}
+              className="flex items-center gap-2 cursor-pointer typo-caption hover:text-[hsl(var(--foreground))]"
+              onClick={() => navigate(`/classrooms/${classroomId}/students`)}
             >
               <GraduationCap className="w-4 h-4" />
-              <span>{MOCK_STUDENTS.length} Students</span>
+              <span>{MOCK_STUDENTS.length ?? 0} Students</span>
             </div>
+          }
+
+          tabs={
+            <MenuTabs tabs={tabs} activeTab={activeTab} onChange={(t) => setActiveTab(t)} />
+
           }
         />
 
-        {/* Content */}
         <PanelContent className="flex flex-col gap-2 p-4">
           {isLoading ? (
             <p>Loading assignments...</p>
-          ) : assignments.length === 0 ? (
+          ) : filteredAssignments.length === 0 ? (
             <p>No assignments found</p>
           ) : (
-            assignments
+            filteredAssignments
               .slice()
               .sort((a, b) => a.id - b.id)
               .map((a) => (
@@ -136,16 +162,16 @@ const MainBarClassroom = () => {
                   key={a.id}
                   assignment={a}
                   isSelect={a.id === assignmentId}
-                  onClick={() =>
-                    navigate(`/classrooms/${classroom?.id}/assignments/${a.id}`)
-                  }
+                  onClick={() => navigate(`/classrooms/${classroomId}/assignments/${a.id}`)}
+                  // onDelete={() => deleteAssignment({ classroomId, assignmentId: a.id })}
                   totalStudent={67}
-                  showActions={true}
                 />
               ))
           )}
         </PanelContent>
       </Panel>
+
+      {/* Confirm dialogs */}
       <ConfirmDialog
         open={confirmDeleteOpen}
         onOpenChange={setConfirmDeleteOpen}
@@ -162,6 +188,24 @@ const MainBarClassroom = () => {
       >
         <p>This action cannot be undone.</p>
       </ConfirmDialog>
+
+      <ConfirmDialog
+        open={confirmLeaveOpen}
+        onOpenChange={setConfirmLeaveOpen}
+        title="Leave Classroom"
+        onConfirm={() => {
+          leaveClassroom(classroomId, {
+            onSuccess: () => navigate("/"),
+            onError: (error) => alert(error?.message || "An error occurred."),
+          });
+          setConfirmLeaveOpen(false);
+        }}
+        confirmText="Leave"
+        cancelText="Cancel"
+      >
+        <p>Are you sure you want to leave this classroom?</p>
+      </ConfirmDialog>
+
       <EditClassDialog
         open={openEdit}
         onClose={() => setOpenEdit(false)}
@@ -171,9 +215,16 @@ const MainBarClassroom = () => {
           editClassroom(selectedClass.id, newName);
         }}
       />
+
+      {classroomId && (
+        <CreateAssignmentDialog
+          open={openCreate}
+          onOpenChange={setOpenCreate}
+          classroomId={classroomId}
+        />
+      )}
     </>
   );
 };
-
 
 export default MainBarClassroom;

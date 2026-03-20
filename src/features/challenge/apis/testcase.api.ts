@@ -2,26 +2,26 @@ import { httpClient } from "@/app/services/httpClient";
 
 export type TestCase = {
     id: number;
-    challenge_id: number;
+    challengeId: number;
     input: string;
-    expected_output: string;
+    expectedOutput: string;
     score: number;
-    is_hidden: boolean;
+    isHidden: boolean;
 };
 
 export type CreateTestCaseDto = {
-    challenge_id: number;
+    challengeId: number;
     input: string;
-    expected_output: string;
+    expectedOutput: string;
     score: number;
-    is_hidden: boolean;
+    isHidden: boolean;
 };
 
 export type UpdateTestCaseDto = {
     input?: string;
-    expected_output?: string;
+    expectedOutput?: string;
     score?: number;
-    is_hidden?: boolean;
+    isHidden?: boolean;
 };
 
 export const testCaseApi = {

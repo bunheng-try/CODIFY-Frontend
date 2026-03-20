@@ -23,12 +23,14 @@
   --surface-hover: 270 40% 96%;
   --surface-active: 270 45% 92%;
 
+  --card: 260 16% 91%;
+
   /* =========================
      Text
      ========================= */
 
   --foreground: 260 10% 15%;
-  --muted-foreground: 260 6% 42%;
+  --muted-foreground: 260 6% 44%;
 
   /* =========================
      Borders
@@ -110,62 +112,6 @@
 
 @layer utilities {
 
-  /* .typo-display {
-    @apply text-2xl font-semibold;
-  }
-
-  .typo-heading {
-    @apply text-xl font-semibold;
-  }
-
-  .typo-title {
-    @apply text-lg font-semibold;
-  }
-
-  .typo-body {
-    @apply text-sm;
-  }
-
-  .typo-body-sm {
-    @apply text-xs;
-  }
-
-  .typo-label {
-    @apply text-xs font-medium;
-  }
-
-  .typo-caption {
-    @apply text-xs text-muted-foreground;
-  } */
-
-  /* Challenge Level Badges */
-  .challenge-easy {
-    background-color: hsl(120, 30%, 85%);
-    color: hsl(120, 40%, 20%);
-  }
-
-  .challenge-medium {
-    background-color: hsl(45, 60%, 85%);
-    color: hsl(45, 40%, 20%);
-  }
-
-  .challenge-hard {
-    background-color: hsl(0, 70%, 85%);
-    color: hsl(0, 50%, 20%);
-  }
-
-  /* Status Badges */
-  .status-draft {
-    background-color: hsl(260, 15%, 80%);
-    color: hsl(260, 10%, 20%);
-  }
-
-  .status-published {
-    background-color: hsl(285, 40%, 80%);
-    color: hsl(285, 45%, 20%);
-  }
-
-  /* General Badge Styles */
   .badge {
     border-radius: var(--radius);
     padding: 0.2rem 0.5rem;
@@ -173,5 +119,76 @@
     font-weight: 500;
     display: inline-block;
     text-transform: capitalize;
+  }
+
+  .challenge-easy {
+    background-color: hsl(var(--challenge-easy));
+    color: hsl(var(--challenge-easy-foreground));
+  }
+
+  .challenge-medium {
+    background-color: hsl(var(--challenge-medium));
+    color: hsl(var(--challenge-medium-foreground));
+  }
+
+  .challenge-hard {
+    background-color: hsl(var(--challenge-hard));
+    color: hsl(var(--challenge-hard-foreground));
+  }
+
+  .status-draft {
+    background-color: hsl(var(--status-draft));
+    color: hsl(var(--status-foreground));
+  }
+
+  .status-published {
+    background-color: hsl(var(--status-published));
+    color: hsl(var(--status-foreground));
+  }
+
+  .typo-display {
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  .typo-heading {
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  .typo-title {
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .typo-body {
+    font-size: 0.875rem;
+  }
+
+  .typo-body-sm {
+    font-size: 0.75rem;
+  }
+
+  .typo-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
+  .typo-caption {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: hsl(var(--muted-foreground));
+  }
+
+  .typo-tab-active {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: hsl(var(--primary));
+  }
+
+  .typo-tab-inactive {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: hsl(var(--muted-foreground));
   }
 }

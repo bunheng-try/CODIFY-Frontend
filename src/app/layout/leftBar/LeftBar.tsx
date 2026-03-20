@@ -12,6 +12,7 @@ import { LeftBarClassesSkeleton } from "@/features/classes/components/LeftBarCla
 import { LeftBarClassesError } from "@/features/classes/components/LeftBarClassesError"
 import { ConfirmDialog } from "@/shared/components/design/dialog"
 import { EditClassDialog } from "@/features/classes/components/EditClassDialog"
+import { authApi } from "@/features/auth/apis/auth.api"
 
 export function LeftBar() {
   const navigate = useNavigate()
@@ -42,7 +43,7 @@ export function LeftBar() {
 
   return (
     <>
-      <aside className="flex h-full w-16 flex-col border-r border-border bg-[hsl(var(--surface-2))]">
+      <aside className="flex h-full w-16 flex-col border-r border-border bg-card">
         {classes.length === 0 && (
           <div className="flex flex-col items-center justify-center flex-1 px-2 py-4 text-center text-sm text-[hsl(var(--muted-foreground))]">
             <p>No classes available</p>
@@ -64,7 +65,7 @@ export function LeftBar() {
 
         <div className="flex-1" />
 
-        {/* bottom actions */}
+      
         <div className="flex flex-col gap-1 px-2 py-2">
           <LeftBarButton
             icon={<Plus className="h-5 w-5" />}
@@ -77,9 +78,10 @@ export function LeftBar() {
             onClick={() => navigate('challenge-library')}
           />
           <LeftBarButton
-            icon={<User className="h-5 w-5 text-primary" />}
-            tooltip="Profile"
-          />
+          onClick={async () => await authApi.logout()}
+          icon={<User className="h-5 w-5 text-primary" />}
+          tooltip="Profile"
+        />
         </div>
       </aside>
 

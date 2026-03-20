@@ -1,80 +1,93 @@
+import MenuTabs from "@/shared/components/menu_tabs/MenuTabs";
 import { Button } from "@/shared/components/ui/button";
-import { MoreVerticalIcon } from "lucide-react";
+import { useAssignmentTabs } from "../hooks/useMenuTabs";
+import { CodeIcon, SettingsIcon, UsersIcon } from "lucide-react";
+import { usePublishAssignment } from "../hooks/useAssignmentQuery";
 import type { Assignment } from "../apis/assignment.api";
+import type { JSX } from "react";
+import { useRef, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { PanelHeader } from "@/shared/components/design/PanelHeader";
 import { EditableTitle } from "@/shared/components/design/EditableTitle";
-import MenuTabs, { type TabItem } from "@/shared/components/menu_tabs/MenuTabs";
-import type { AssignmentTab } from "../hooks/useMenuTabs";
+
+
 
 type Props = {
+  classroomId: number;
+  isDirty: boolean;
   assignment: Assignment;
-  title: string;
-  isEditing: boolean;
-  onTitleChange: (newTitle: string) => void;
-  onEditStart: () => void;
-  onEditDone: () => void;
-  onPublish?: () => void;
-  onUnpublish?: () => void;
-  onDiscard?: () => void;
-  onMenuClick?: () => void;
+  updateField: <K extends keyof Assignment>(key: K, value: Assignment[K]) => void;
+  save: () => void;
+  cancel: () => void;
 };
 
-export const AssignmentHeader = ({
-  assignment,
-  title,
-  isEditing,
-  onTitleChange,
-  onEditStart,
-  onEditDone,
-  onPublish,
-  onUnpublish,
-  onDiscard,
-  onMenuClick,
-  tabs,
-  activeTab,
-  onTabChange,
-}: Props & {
-    tabs: TabItem<AssignmentTab>[]
-    activeTab: AssignmentTab
-    onTabChange: (tab: AssignmentTab) => void
-}) => {
-  const showPublishedUI = assignment.isPublished && !isEditing;
+const AssignmentHeader = ({ classroomId, isDirty, assignment, updateField, save, cancel }: Props) => {
+  const { activeTab, setActiveTab } = useAssignmentTabs();
+  const { mutate: publishAssignment } = usePublishAssignment();
+
+  const titleInputRef = useRef<HTMLInputElement>(null);
+  const location = useLocation();
+  const autoFocusTitle = location.state?.autoFocusTitle || false;
+
+  useEffect(() => {
+    if (autoFocusTitle && titleInputRef.current) {
+      titleInputRef.current.focus();
+      titleInputRef.current.select();
+    }
+  }, [autoFocusTitle]);
+
+  const showPublishedUI = assignment.isPublished;
+
+  const handlePublish = () => publishAssignment({ classroomId, assignmentId: assignment.id });
+
+  type TabKey = "challenge" | "settings" | "submission";
+  interface Tab { key: TabKey; label: string; icon: JSX.Element; }
+
+  const tabs: Tab[] = [
+    { key: "challenge", label: "Challenges", icon: <CodeIcon className="w-4 h-4 mr-2" /> },
+    { key: "settings" as TabKey, label: "Settings", icon: <SettingsIcon className="w-4 h-4 mr-2" /> },
+    { key: "submission" as TabKey, label: "Submission", icon: <UsersIcon className="w-4 h-4 mr-2" /> },
+  ];
 
   return (
     <PanelHeader
       topLeft={
-        showPublishedUI ? (
-          <h2 className="text-lg font-semibold truncate">{title}</h2>
-        ) : (
-          <EditableTitle value={title} onChange={onTitleChange} />
-        )
+        <EditableTitle
+          value={assignment.title}
+          onChange={(val) => updateField("title", val)} />
       }
       topRight={
-        showPublishedUI ? (
-          <>
-            <Button variant="outline" onClick={onUnpublish}>Unpublish</Button>
-            <Button variant="ghost" size="icon-sm" onClick={onMenuClick} aria-label="More options">
-              <MoreVerticalIcon className="w-5 h-5" />
-            </Button>
-          </>
-        ) : (
-          <>
-            <Button variant="secondary" onClick={onDiscard}>Discard</Button>
-            <Button variant="default" onClick={onPublish}>Publish</Button>
-            <Button variant="ghost" size="icon-sm" onClick={onMenuClick} aria-label="More options">
-              <MoreVerticalIcon className="w-5 h-5" />
-            </Button>
-          </>
-        )
+        <>
+          {isDirty ? (
+            <>
+              <Button variant="secondary" onClick={cancel}>
+                Cancel
+              </Button>
+              <Button variant="default" onClick={save}>
+                Save
+              </Button>
+            </>
+          ) : !showPublishedUI ? (
+            <>
+              <Button variant="default" onClick={handlePublish}>Publish</Button>
+              <Button variant="secondary" onClick={() => console.log("Delete assignment")}>Delete</Button>
+            </>
+          ) : (
+            <>
+              <Button variant="secondary" onClick={() => console.log("Delete assignment")}>Delete</Button>
+            </>
+          )}
+        </>
       }
       tabs={
         <MenuTabs
           tabs={tabs}
           activeTab={activeTab}
-          onChange={onTabChange}
-          className="-mt-px"
+          onChange={setActiveTab}
         />
       }
     />
   );
 };
+
+export default AssignmentHeader;

@@ -1,68 +1,107 @@
+"use client";
+
 import { useState } from "react";
+import { useParams } from "react-router-dom";
+
 import MenuTabs from "@/shared/components/menu_tabs/MenuTabs";
-import MainPanel from "@/shared/components/layout/mainPanel/MainPanel";
-import { BasePanelHeader } from "@/shared/components/layout/mainPanel/BasePanelHeader";
-import OverviewTab from "../components/OverviewTab";
-import StarterCodeTab from "../components/StarterCodeTab";
-import TestCaseTab from "../components/TestCaseTab";
-import { useChallengeEditorPanel } from "../hooks/useChallengeEditorPanel";
-import { getEditorTabs, type EditorTab } from "../components/tabs";
 import { Button } from "@/shared/components/ui/button";
 
-interface Props {
-    mode: "create" | "edit";
-    challengeId?: number;
-    onClose: () => void;
-}
+import OverviewTab from "../components/OverviewTab";
+import StarterCodeTab from "../components/StarterCodeTab";
+import TestCasesTab from "../components/TestCaseTab";
 
-export default function ChallengeEditorPanel({ mode: initialMode, challengeId: initialChallengeId, onClose }: Props) {
+import { useChallengeEditorDirty } from "../hooks/useChallengeEditorDirty";
+import { useTestCasesDirty } from "../hooks/useTestCaseDirty";
+import type { EditorTab } from "../components/tabs";
+import { PanelHeader } from "@/shared/components/design/PanelHeader";
+import { Panel, PanelContent } from "@/shared/components/design/Panel";
+
+export default function ChallengeEditorPanel() {
+    const { challengeId } = useParams();
+    const numericChallengeId = challengeId ? Number(challengeId) : undefined;
+
     const {
-        mode,
-        challengeId,
         draft,
         updateField,
-        remove,
-        isLoading,
+        cancel,
+        save,
+        isDirty,
         isSaving,
-        isDeleting,
-        handleSave,
-        handleCancel,
-    } = useChallengeEditorPanel(initialMode, initialChallengeId);
+        isLoading,
+    } = useChallengeEditorDirty(numericChallengeId!);
+
+    const {
+        draft: testCaseDraft,
+        updateField: updateTestCase,
+        addDraft,
+        save: saveTestCase,
+        cancel: cancelTestCase,
+        isDirty: isTestCaseDirty,
+    } = useTestCasesDirty(numericChallengeId!);
 
     const [activeTab, setActiveTab] = useState<EditorTab>("overview");
-    const tabs = getEditorTabs(Boolean(challengeId));
 
-    if (isLoading) return <div className="p-6">Loading...</div>;
+    if (isLoading || !draft) {
+        return <div className="p-6 text-center text-gray-500">Loading challenge...</div>;
+    }
+
+    const tabs = [
+        { key: "overview" as EditorTab, label: "Overview" },
+        { key: "starter" as EditorTab, label: "Starter Code" },
+        { key: "testcases" as EditorTab, label: "Test Cases" },
+    ];
+
+    const hasDirtyTestCases = testCaseDraft?.some(tc => isTestCaseDirty(tc.id)) ?? false;
+
+    
+
+    const handleCancelAll = () => {
+        cancel();
+        if (testCaseDraft) testCaseDraft.forEach(tc => cancelTestCase(tc.id));
+    };
+
+    const handleSaveAll = async () => {
+
+        await save();
+        if (testCaseDraft?.length) {
+            for (const tc of testCaseDraft) {
+                if (isTestCaseDirty(tc.id)) await saveTestCase(tc.id);
+            }
+        }
+    };
 
     return (
-        <MainPanel
-            header={
-                <>
-                    <BasePanelHeader
-                        left={<h2 className="text-lg font-semibold">{mode === "create" ? "Create Challenge" : "Edit Challenge"}</h2>}
-                        right={
-                            <>
-                                <Button size="default" variant="outline" onClick={() => handleCancel(onClose)}>Cancel</ Button>
-                                {mode === "edit" && <Button size="default" variant="destructive" onClick={remove}>Delete</ Button> }
-                                <Button size="default" variant="default" onClick={() => handleSave(onClose)}>{mode === "create" ? "Create" : "Save"}</ Button>
+        <Panel className="h-full bg-white">
+            <PanelHeader
+                topLeft={<h2 className="text-lg font-semibold">Edit Challenge</h2>}
+                topRight={
+                    <>
+                        <Button variant="outline" onClick={handleCancelAll} disabled={isSaving}>
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={handleSaveAll}
+                            disabled={!isDirty && !hasDirtyTestCases || isSaving}
+                        >
+                            Save
+                        </Button>
+                    </>
+                }
+                tabs={<MenuTabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />}
+            />
 
-                                {/* <button onClick={() => handleCancel(onClose)} className="px-4 py-2 border rounded-md text-sm">Cancel</button>
-                                {mode === "edit" && <button onClick={remove} disabled={isDeleting} className="px-4 py-2 border text-red-600 rounded-md text-sm">Delete</button>}
-                                <button onClick={() => handleSave(onClose)} disabled={isSaving} className="px-4 py-2 bg-purple-600 text-white rounded-md text-sm">{mode === "create" ? "Create" : "Save"}</button> */}
-                            </>
-                        }
-                    />
-                    <div className="px-6">
-                        <MenuTabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
-                    </div>
-                </>
-            }
-        >
-            <div className="p-6">
+            <PanelContent>
                 {activeTab === "overview" && <OverviewTab draft={draft} updateField={updateField} />}
                 {activeTab === "starter" && <StarterCodeTab draft={draft} updateField={updateField} />}
-                {activeTab === "testcases" && challengeId && <TestCaseTab challengeId={challengeId} />}
-            </div>
-        </MainPanel>
+                {activeTab === "testcases" && testCaseDraft && (
+                    <TestCasesTab
+                        challengeId={numericChallengeId!}
+                        draft={testCaseDraft}
+                        updateField={updateTestCase}
+                        addDraft={addDraft}
+                    />
+                )}
+            </PanelContent>
+        </Panel>
     );
 }

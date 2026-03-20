@@ -1,76 +1,82 @@
+import AssignmentHeader from "../components/AssignmentHeader";
 import ChallengeTab from "../components/ChallengesTab";
 import { SettingsTab } from "../components/SettingsTab";
 import { SubmissionsTab } from "../components/SubmissionTab";
-import { useAssignmentTabs, type AssignmentTab } from "../hooks/useMenuTabs";
-import { mockSubmissions } from "@/shared/types/types";
-import { AssignmentHeader } from "../components/AssignmentHeader";
-import { type TabItem } from "@/shared/components/menu_tabs/MenuTabs";
+import { useAssignmentTabs } from "../hooks/useMenuTabs";
+import { useClassroomRoute } from "@/features/classes/hooks/useClassroomRoute";
+import { useClassroomRole } from "@/features/classes/hooks/useClassroomRole";
 import { Panel, PanelContent } from "@/shared/components/design/Panel";
-import { useAssignmentEditor } from "../hooks/useAssignmentEditor";
+import { useAssignmentEditorDirty } from "../hooks/useAssignmentEditorDirty";
+import { mockSubmissions } from "@/shared/types/types";
+import { useChallengesDirty } from "../hooks/useChallengeDirty";
+import { useEffect } from "react";
 
 const AssignmentEditor = () => {
-  const { activeTab, setActiveTab } = useAssignmentTabs();
+  const { activeTab } = useAssignmentTabs();
+  const { classroomId, assignmentId } = useClassroomRoute();
+  const { data: roleData } = useClassroomRole(classroomId);
+  const isAdmin = roleData?.role === "OWNER";
 
   const {
-    assignment,
+    draft,
+    updateField,
+    cancel,
+    save,
+    isDirty,
+    isSaving,
     isLoading,
-    title,
-    setTitle,
-    isEditing,
-    setIsEditing,
-    publish,
-    unpublish,
-    deleteAssignment,
-  } = useAssignmentEditor();
+  } = useAssignmentEditorDirty(classroomId, assignmentId);
 
-  if (isLoading) {
-    return <div className="p-6">Loading assignment...</div>;
+  const {
+    draft: challengeDraft,
+    addSelected: addChallenge,
+    isAdding: isAddingChallenges,
+    hasUnsaved: hasUnsavedChallenge,
+    save: saveChallenge,
+    cancel: cancelChallenge,
+  } = useChallengesDirty(assignmentId, classroomId, draft?.assignmentChallenges || []);
+
+  if (isLoading || !draft) {
+    return <div className="p-6 text-muted-foreground">Loading assignment...</div>;
   }
 
-  if (!assignment) {
-    return <div className="p-6">Select an assignment</div>;
-  }
 
-  const tabs: TabItem<AssignmentTab>[] = [
-    { key: "challenge", label: "Challenges" },
-    { key: "settings", label: "Settings" },
-    ...(assignment.isPublished
-      ? [{ key: "submission" as AssignmentTab, label: "Submissions" }]
-      : []),
-  ];
+  const handleCancelAll = () => {
+    cancel();
+    if (hasUnsavedChallenge) cancelChallenge();
+  };
+
+  const handleSaveAll = async () => {
+
+    await save();
+    if (hasUnsavedChallenge) saveChallenge(); 
+  };
 
   return (
     <Panel>
       <AssignmentHeader
-        assignment={assignment}
-        title={title}
-        isEditing={isEditing}
-        onTitleChange={setTitle}
-        onEditStart={() => setIsEditing(true)}
-        onEditDone={() => setIsEditing(false)}
-        onPublish={publish}
-        onUnpublish={unpublish}
-        onDiscard={() => setIsEditing(false)}
-        tabs={tabs}
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
+        classroomId={classroomId}
+        assignment={draft}
+        isDirty={isDirty || hasUnsavedChallenge}
+        updateField={updateField}
+        save={handleSaveAll}
+        cancel={handleCancelAll}
+
       />
 
       <PanelContent>
         {activeTab === "challenge" && (
-          <ChallengeTab challenges={assignment.codingChallenges} />
+          <ChallengeTab challenges={challengeDraft} onAddSelected={addChallenge} />
         )}
 
-        {activeTab === "settings" && (
+        {isAdmin && activeTab === "settings" && (
           <SettingsTab
-            assignment={assignment}
-            isEditing={isEditing}
-            onEditChange={setIsEditing}
-            onDelete={deleteAssignment}
+            draft={draft} 
+            updateField={updateField}
           />
         )}
 
-        {activeTab === "submission" && assignment.isPublished && (
+        {isAdmin && activeTab === "submission" && (
           <SubmissionsTab submissions={mockSubmissions ?? []} />
         )}
       </PanelContent>

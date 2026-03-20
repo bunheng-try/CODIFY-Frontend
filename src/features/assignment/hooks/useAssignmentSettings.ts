@@ -15,29 +15,22 @@ const parseDateTime = (iso?: string) => {
 };
 
 export const useAssignmentSettings = (assignment: Assignment) => {
-  const { date: initDate, time: initTime } = parseDateTime(
-    assignment.dueAt
-  );
+  const { date: initDate, time: initTime } = parseDateTime(assignment.dueAt);
 
   const [dueDate, setDueDate] = useState(initDate);
   const [timeDue, setTimeDue] = useState(initTime || DEFAULT_TIME);
-  // const [points, setPoints] = useState(
-  //   assignment.points != null ? String(assignment.points) : ""
-  // );
-  const [description, setDescription] = useState(
-    assignment.description || ""
-  );
+  const [points, setPoints] = useState<number | null>(assignment.points ?? null);
+  const [description, setDescription] = useState(assignment.description || "");
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   useEffect(() => {
     const { date, time } = parseDateTime(assignment.dueAt);
 
     setDueDate(date);
     setTimeDue(time || DEFAULT_TIME);
-    // setPoints(assignment.points != null ? String(assignment.points) : "");
+    setPoints(assignment.points ?? null);
     setDescription(assignment.description || "");
   }, [assignment]);
-
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const combineDateTimeToISO = (date: string, time: string) => {
     const [year, month, day] = date.split("-").map(Number);
@@ -56,16 +49,16 @@ export const useAssignmentSettings = (assignment: Assignment) => {
         dueDate && timeDue
           ? combineDateTimeToISO(dueDate, timeDue)
           : assignment.dueAt,
+      points: points ?? undefined,
     };
   };
-
 
   const handleCancel = () => {
     const { date, time } = parseDateTime(assignment.dueAt);
 
     setDueDate(date);
     setTimeDue(time || DEFAULT_TIME);
-    // setPoints(assignment.points != null ? String(assignment.points) : "");
+    setPoints(assignment.points ?? null);
     setDescription(assignment.description || "");
   };
 
@@ -83,8 +76,8 @@ export const useAssignmentSettings = (assignment: Assignment) => {
     setDueDate,
     timeDue,
     setTimeDue,
-    // points,
-    // setPoints,
+    points,
+    setPoints,
     description,
     setDescription,
     showDeleteDialog,

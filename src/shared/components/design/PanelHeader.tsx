@@ -1,36 +1,34 @@
 import { cn } from "@/lib/utils";
 
 interface PanelHeaderProps {
-    topLeft?: React.ReactNode; // what goes in start
-    topRight?: React.ReactNode; // what goes in end
-    bottomContent?: React.ReactNode; // optional tabs or extra content
+    topLeft?: React.ReactNode;  // left content (e.g., title, icon)
+    topRight?: React.ReactNode; // right content (e.g., buttons)
+    bottomContent?: React.ReactNode; // optional extra content under top row
+    tabs?: React.ReactNode; // optional tabs below everything
     className?: string;
-    tabs?: React.ReactNode;
 }
 
-export function PanelHeader({ topLeft, topRight, bottomContent, className, tabs }: PanelHeaderProps) {
+export function PanelHeader({ topLeft, topRight, bottomContent, tabs, className }: PanelHeaderProps) {
     return (
         <div
             className={cn(
-                "flex flex-col gap-[var(--spacing-xl)] sticky top-0 px-[var(--card-padding-x)] py-[var(--card-padding-y)] border-b bg-background",
+                "sticky top-0 z-10 flex flex-col bg-background border-b px-[var(--card-padding-x)] py-[var(--card-padding-y)]",
                 className
             )}
         >
-            <div className="flex flex-col gap-[var(--spacing-lg)]">                
-                <div className="flex items-center justify-between w-full">
-                    <div className="flex items-center gap-2 min-w-0 flex-1">{topLeft}</div>
-                    <div className="flex items-center gap-2">{topRight}</div>
-                </div>  
-
-                {bottomContent && (
-                    <div className="w-full">
-                        {bottomContent}
-                    </div>
-                )}
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 min-w-0 flex-1">{topLeft}</div>
+                <div className="flex items-center gap-2">{topRight}</div>
             </div>
 
+            {bottomContent && (
+                <div className="flex flex-col gap-2 mt w-full">
+                    {bottomContent}
+                </div>
+            )}
+
             {tabs && (
-                <div className="w-full">
+                <div className="mt-3 w-full">
                     {tabs}
                 </div>
             )}

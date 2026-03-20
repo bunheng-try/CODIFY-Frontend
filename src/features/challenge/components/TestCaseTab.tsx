@@ -1,156 +1,190 @@
+"use client";
+
 import { useState } from "react";
 import { Button } from "@/shared/components/ui/button";
-import type { CreateTestCaseDto, TestCase, UpdateTestCaseDto } from "../apis/testcase.api";
-import { FormDialog } from "@/shared/components/design/dialog";
-import { useCreateTestCase, useDeleteTestCase, useTestCases, useUpdateTestCase } from "../hooks/useTestCaseQuery";
+import { EditableField } from "@/shared/components/design/EditableField";
+import { FormDialog } from "@/shared/components/design/dialog/FormDialog";
+
+import type { TestCase, CreateTestCaseDto } from "../apis/testcase.api";
+import { SectionContainer } from "@/shared/components/design/SectionContainer";
+import { LabeledSection } from "@/shared/components/design/LabeledSection";
+import { FieldError } from "@/shared/components/design/FieldError";
 
 interface Props {
     challengeId: number;
+    draft: TestCase[];
+    updateField: (id: number, key: keyof TestCase, value: any) => void;
+    addDraft: (tc: TestCase) => void;
 }
 
-export default function TestCasesTab({ challengeId }: Props) {
-    const { data: testCases = [] } = useTestCases(challengeId);
-    const createTestCase = useCreateTestCase(challengeId);
-    const updateTestCase = useUpdateTestCase();
-    const deleteTestCase = useDeleteTestCase();
-
+export default function TestCasesTab({ challengeId, draft, updateField, addDraft }: Props) {
+    const [editedValues, setEditedValues] = useState<Record<number, Partial<TestCase>>>({});
     const [dialogOpen, setDialogOpen] = useState(false);
     const [newTest, setNewTest] = useState<CreateTestCaseDto>({
-        challenge_id: challengeId,
+        challengeId,
         input: "",
-        expected_output: "",
+        expectedOutput: "",
         score: 0,
-        is_hidden: false,
+        isHidden: false,
     });
+    const [errors, setErrors] = useState<{ input?: string; expectedOutput?: string; score?: string }>({});
+
+    const validateNewTest = () => {
+        const errs: typeof errors = {};
+
+        if (!newTest.input.trim()) errs.input = "Input cannot be empty";
+        if (!newTest.expectedOutput.trim()) errs.expectedOutput = "Expected output cannot be empty";
+
+        if (isNaN(newTest.score)) {
+            errs.score = "Score must be a number";
+        } else if (newTest.score < 0) {
+            errs.score = "Score cannot be negative";
+        }
+
+        setErrors(errs);
+
+        return Object.keys(errs).length === 0;
+    };
+
+    const markDirty = (id: number, key: keyof TestCase, value: any) => {
+        setEditedValues(prev => ({
+            ...prev,
+            [id]: { ...prev[id], [key]: value },
+        }));
+        updateField(id, key, value);
+    };
 
     const handleCreate = () => {
-        createTestCase.mutate(newTest, {
-            onSuccess: () => {
-                setNewTest({ ...newTest, input: "", expected_output: "", score: 0, is_hidden: false });
-                setDialogOpen(false);
-            },
+        if (!validateNewTest()) return;
+
+        const tempId = -Date.now();
+        const newTC: TestCase = {
+            id: tempId,
+            challengeId,
+            input: newTest.input,
+            expectedOutput: newTest.expectedOutput,
+            score: newTest.score,
+            isHidden: newTest.isHidden,
+        };
+
+        addDraft(newTC);
+
+        setNewTest({
+            challengeId,
+            input: "",
+            expectedOutput: "",
+            score: 0,
+            isHidden: false,
         });
-    };
 
-    const handleUpdate = (id: number, dto: Partial<UpdateTestCaseDto>) => {
-        updateTestCase.mutate({ id, dto });
-    };
-
-    const handleDelete = (id: number) => {
-        deleteTestCase.mutate(id);
+        setDialogOpen(false);
     };
 
     return (
-        <div className="px-1 pb-6">
+        <SectionContainer title="Test Cases">
             <div className="flex justify-between items-center mb-4">
-                <h3 className="text-base font-semibold text-[hsl(var(--foreground))]">Test Cases</h3>
+                <p className="text-sm text-gray-500">
+                    Manage the test cases for this challenge.
+                </p>
                 <Button onClick={() => setDialogOpen(true)}>Add Test Case</Button>
             </div>
 
-            <div className="border border-gray-100 rounded-xl overflow-hidden">
-                {/* Table Header */}
-                <div className="grid grid-cols-[3fr_3fr_1fr_1fr_1fr] px-4 py-3 bg-gray-50 border-b border-gray-100">
-                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Input</span>
-                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Expected Output</span>
-                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Score</span>
-                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Hidden</span>
-                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Actions</span>
+            {draft.length === 0 ? (
+                <div className="px-4 py-6 text-center text-gray-400 text-sm">
+                    No test cases found.
                 </div>
-
-                {/* Table Rows */}
-                {testCases.length === 0 ? (
-                    <div className="px-4 py-6 text-center text-gray-400 text-sm">No test cases found.</div>
-                ) : (
-                    testCases.map((tc: TestCase, i: number) => (
-                        <div
-                            key={tc.id}
-                            className={`grid grid-cols-[3fr_3fr_1fr_1fr_1fr] items-center px-4 py-3.5 hover:bg-gray-50 transition-colors ${i !== testCases.length - 1 ? "border-b border-gray-100" : ""
-                                }`}
-                        >
-                            <input
-                                type="text"
-                                value={tc.input}
-                                className="w-full border rounded px-2 py-1 text-sm"
-                                onChange={(e) => handleUpdate(tc.id, { input: e.target.value })}
-                            />
-                            <input
-                                type="text"
-                                value={tc.expected_output}
-                                className="w-full border rounded px-2 py-1 text-sm"
-                                onChange={(e) => handleUpdate(tc.id, { expected_output: e.target.value })}
-                            />
-                            <input
-                                type="number"
-                                value={tc.score}
-                                className="w-full border rounded px-2 py-1 text-sm"
-                                onChange={(e) => handleUpdate(tc.id, { score: Number(e.target.value) })}
-                            />
-                            <div className="flex justify-center">
-                                <input
-                                    type="checkbox"
-                                    checked={tc.is_hidden}
-                                    onChange={(e) => handleUpdate(tc.id, { is_hidden: e.target.checked })}
-                                />
-                            </div>
-                            <div className="flex justify-center">
-                                <button
-                                    className="text-red-500 hover:underline text-sm"
-                                    onClick={() => handleDelete(tc.id)}
+            ) : (
+                    <div className="space-y-4">
+                        {draft.map(tc => {
+                            const edited = editedValues[tc.id] || {};
+                            return (
+                                <div
+                                    key={tc.id}
+                                    className="
+                    grid gap-4 p-3 border rounded-lg hover:bg-gray-50 transition-colors
+                    grid-cols-1 sm:grid-cols-5
+                    items-center
+                "
                                 >
-                                    Delete
-                                </button>
-                            </div>
-                        </div>
-                    ))
-                )}
-            </div>
+                                    <LabeledSection label="Input">
+                                        <EditableField
+                                            value={edited.input ?? tc.input}
+                                            onChange={val => markDirty(tc.id, "input", val)}
+                                        />
+                                    </LabeledSection>
+                                    <LabeledSection label="Expected Output">
+                                        <EditableField
+                                            value={edited.expectedOutput ?? tc.expectedOutput}
+                                            onChange={val => markDirty(tc.id, "expectedOutput", val)}
+                                        />
+                                    </LabeledSection>
+                                    <LabeledSection label="Score">
+                                        <EditableField
+                                            value={String(edited.score ?? tc.score)}
+                                            onChange={val => markDirty(tc.id, "score", Number(val))}
+                                        />
+                                    </LabeledSection>
+                                    <LabeledSection label="Hidden">
+                                        <input
+                                            type="checkbox"
+                                            checked={edited.isHidden ?? tc.isHidden}
+                                            onChange={e => markDirty(tc.id, "isHidden", e.target.checked)}
+                                        />
+                                    </LabeledSection>
+                                </div>
+                            );
+                        })}
+                    </div>
+            )}
 
-            {/* Add Test Case Dialog */}
             <FormDialog
                 open={dialogOpen}
                 onOpenChange={setDialogOpen}
                 title="Add Test Case"
                 onSubmit={handleCreate}
                 submitText="Add"
+                cancelText="Cancel"
             >
                 <div className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-[hsl(var(--foreground))]">Input</label>
-                        <input
-                            type="text"
+                    <LabeledSection label="Score">
+                        <EditableField
+                            value={String(newTest.score)}
+                            onChange={(val) => setNewTest({ ...newTest, score: Number(val) })}
+                            placeholder="Score"
+                            className={errors.score ? "border-red-500" : ""}
+                        />
+                        <FieldError message={errors.score} />
+                    </LabeledSection>
+
+                    <LabeledSection label="Input">
+                        <EditableField
                             value={newTest.input}
-                            onChange={(e) => setNewTest({ ...newTest, input: e.target.value })}
-                            className="mt-1 block w-full border rounded px-2 py-1 text-sm"
+                            onChange={(val) => setNewTest({ ...newTest, input: val })}
+                            placeholder="Input"
+                            className={errors.input ? "border-red-500" : ""}
                         />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-[hsl(var(--foreground))]">Expected Output</label>
-                        <input
-                            type="text"
-                            value={newTest.expected_output}
-                            onChange={(e) => setNewTest({ ...newTest, expected_output: e.target.value })}
-                            className="mt-1 block w-full border rounded px-2 py-1 text-sm"
+                        <FieldError message={errors.input} />
+                    </LabeledSection>
+
+                    <LabeledSection label="Expected Output">
+                        <EditableField
+                            value={newTest.expectedOutput}
+                            onChange={(val) => setNewTest({ ...newTest, expectedOutput: val })}
+                            placeholder="Expected Output"
+                            className={errors.expectedOutput ? "border-red-500" : ""}
                         />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-[hsl(var(--foreground))]">Score</label>
-                        <input
-                            type="number"
-                            value={newTest.score}
-                            onChange={(e) => setNewTest({ ...newTest, score: Number(e.target.value) })}
-                            className="mt-1 block w-full border rounded px-2 py-1 text-sm"
-                        />
-                    </div>
+                        <FieldError message={errors.expectedOutput} />
+                    </LabeledSection>
                     <div className="flex items-center gap-2">
                         <input
                             type="checkbox"
-                            checked={newTest.is_hidden}
-                            onChange={(e) => setNewTest({ ...newTest, is_hidden: e.target.checked })}
+                            checked={newTest.isHidden}
+                            onChange={e => setNewTest({ ...newTest, isHidden: e.target.checked })}
                         />
-                        <label className="text-sm text-[hsl(var(--foreground))]">Hidden</label>
+                        <label>Hidden</label>
                     </div>
                 </div>
             </FormDialog>
-        </div>
+        </SectionContainer>
     );
 }
