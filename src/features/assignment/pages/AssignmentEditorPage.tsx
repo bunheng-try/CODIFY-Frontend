@@ -9,6 +9,7 @@ import { Panel, PanelContent } from "@/shared/components/design/Panel";
 import { useAssignmentEditorDirty } from "../hooks/useAssignmentEditorDirty";
 import { mockSubmissions } from "@/shared/types/types";
 import { useChallengesDirty } from "../hooks/useChallengeDirty";
+import { useEffect } from "react";
 
 const AssignmentEditor = () => {
   const { activeTab } = useAssignmentTabs();
@@ -51,14 +52,12 @@ const AssignmentEditor = () => {
     if (hasUnsavedChallenge) saveChallenge(); 
   };
 
-
-
   return (
     <Panel>
       <AssignmentHeader
         classroomId={classroomId}
         assignment={draft}
-        isDirty={isDirty && hasUnsavedChallenge}
+        isDirty={isDirty || hasUnsavedChallenge}
         updateField={updateField}
         save={handleSaveAll}
         cancel={handleCancelAll}
