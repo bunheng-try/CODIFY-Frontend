@@ -1,9 +1,9 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { Panel, PanelContent } from "@/shared/components/design/Panel";
+import { Panel } from "@/shared/components/design/Panel";
 import { BasePanelHeader } from "@/shared/components/layout/mainPanel/BasePanelHeader";
 import MainPanel from "@/shared/components/layout/mainPanel/MainPanel";
 import { useAssignment } from "../hooks/useAssignmentQuery";
-import { StudentChallengeRow } from "../components/StudentChallengeRow";
+import { ChallengeCard } from "@/features/challenge/components/ChallengeCard";
 import { ButtonPrimary } from "@/shared/components/design/button";
 
 const StudentAssignmentPage = () => {
@@ -109,12 +109,21 @@ const StudentAssignmentPage = () => {
             </div>
           ) : (
             <div className="flex flex-col gap-2">
+<<<<<<< Updated upstream
               {assignment.codingChallenges.map((challenge, index) => (
                 <StudentChallengeRow
+=======
+              {assignment.assignmentChallenges.map((challenge, index) => (
+                <ChallengeCard
+>>>>>>> Stashed changes
                   key={challenge.id}
-                  index={index + 1}
                   challenge={challenge}
+<<<<<<< Updated upstream
                   onStart={() => handleStart(challenge.id)}
+=======
+                  variant="assignment"
+                  index={index + 1}
+>>>>>>> Stashed changes
                 />
               ))}
             </div>
