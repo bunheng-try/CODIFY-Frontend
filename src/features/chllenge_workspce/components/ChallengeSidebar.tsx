@@ -1,7 +1,7 @@
-import type { Challenge } from "@/shared/types/types";
-import React, { useEffect } from "react";
+import React from "react";
 import { ChallengeItem } from "./ChallengeItem";
 import { useWorkspaceStore } from "../stores/useWorkspaceStore";
+import type { Challenge } from "@/features/challenge/apis/challenge.api";
 
 interface ChallengeSidebarProps {
   challenges: Challenge[];

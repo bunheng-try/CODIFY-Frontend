@@ -1,26 +1,92 @@
-// hooks/useAssignmentActions.ts
 import { useWorkspaceStore } from "../stores/useWorkspaceStore";
-import { useParams } from "react-router-dom";
+import { useSubmissions, useCreateSubmission, useUpdateSubmission, useTurnInSubmission } from "@/features/assignment/hooks/useSubmissionQuery";
 
-export const useAssignmentActions = () => {
-    const { assignmentId } = useParams<{ assignmentId: string }>();
-    const codes = useWorkspaceStore((s) => s.codes);
+import { useAuthStore } from "@/app/store/autStore";
+import { useNavigate, useParams } from "react-router-dom";
+import { useEffect } from "react";
 
-    const saveDraft = () => {
-        if (!assignmentId) return;
-        console.log("Saving draft for assignment:", assignmentId, codes);
-        // TODO: call API to save draft
+export function useAssignmentActions() {
+    const { classroomId, assignmentId } = useParams();
+    const navigate = useNavigate();
+    const currentUser = useAuthStore((s) => s.user);
+    const state = useWorkspaceStore((s) => s);
+    
+    const { data: submissions, isLoading: isSubmissionsLoading } = useSubmissions(Number(classroomId), Number(assignmentId));
+    const mySubmission = submissions?.find(
+        (s) => String(s.userId) === String(currentUser?.id)
+    ) ?? null;
+    
+    const createDraftMutation = useCreateSubmission(Number(classroomId), Number(assignmentId));
+    const updateDraftMutation = useUpdateSubmission(Number(classroomId), Number(assignmentId), Number(mySubmission?.id));
+    const turnInMutation = useTurnInSubmission(Number(classroomId), Number(assignmentId), Number(mySubmission?.id));
+
+    const isSaving =
+        createDraftMutation.isPending ||
+        updateDraftMutation.isPending;
+
+    const isSubmitting =
+        turnInMutation.isPending;
+
+    const isBusy = isSaving || isSubmitting;
+
+    const dirtyChallengeIds = Array.from(state.dirtyChallenges);
+    const isDraftDirty = dirtyChallengeIds.length > 0;
+
+    useEffect(() => {
+        console.log(`Submission: ${mySubmission?.id}`)
+    })
+    
+    const saveDraft = async () => {
+        if (dirtyChallengeIds.length === 0 || isSaving) return;
+
+        let submissionId = mySubmission?.id;
+
+        if (!submissionId) {
+            const created = await createDraftMutation.mutateAsync({ content: "" });
+            submissionId = created.id;
+        }
+
+        if (submissionId) {
+            await updateDraftMutation.mutateAsync({
+                codes: dirtyChallengeIds.map((id) => ({
+                    challengeId: id,
+                    code: state.codes[id],
+                })),
+            });
+        }
+
+        useWorkspaceStore.setState({ dirtyChallenges: [] });
     };
 
-    const submitAssignment = () => {
-        if (!assignmentId) return;
-        console.log("Submitting assignment:", assignmentId, codes);
-        // TODO: call API to submit assignment
+    const submitAssignment = async () => {
+        if (isSubmitting) return;
+
+        let submissionId = mySubmission?.id;
+
+        if (dirtyChallengeIds.length > 0 || !submissionId) {
+            const state = useWorkspaceStore.getState();
+
+            if (!submissionId) {
+                const created = await createDraftMutation.mutateAsync({ content: "" });
+                submissionId = created.id;
+            }
+
+            if (dirtyChallengeIds.length > 0) {
+                await updateDraftMutation.mutateAsync({
+                    codes: dirtyChallengeIds.map((id) => ({
+                        challengeId: id,
+                        code: state.codes[id],
+                    })),
+                });
+
+                useWorkspaceStore.setState({ dirtyChallenges: [] });
+            }
+        }
+
+        await turnInMutation.mutateAsync();
+
+        navigate(`/classrooms/${classroomId}/assignments/${assignmentId}`);
     };
 
-    return {
-        saveDraft,
-        submitAssignment,
-        codes,
-    };
-};
+    return { saveDraft, submitAssignment, isDraftDirty, isBusy, isSaving, isSubmitting };
+}

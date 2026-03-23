@@ -1,25 +1,80 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { Panel } from "@/shared/components/design/Panel";
-import { BasePanelHeader } from "@/shared/components/layout/mainPanel/BasePanelHeader";
-import MainPanel from "@/shared/components/layout/mainPanel/MainPanel";
-import { useAssignment } from "../hooks/useAssignmentQuery";
+import { Panel, PanelContent } from "@/shared/components/design/Panel";
+import { PanelHeader } from "@/shared/components/design/PanelHeader";
+import { Button } from "@/shared/components/ui/button";
 import { ChallengeCard } from "@/features/challenge/components/ChallengeCard";
-import { ButtonPrimary } from "@/shared/components/design/button";
+import { useSubmissions } from "../hooks/useSubmissionQuery";
+import { useAssignment } from "../hooks/useAssignmentQuery";
+import { useCreateSubmission } from "../hooks/useSubmissionQuery";
+import { useAuthStore } from "@/app/store/autStore";
+import { useEffect } from "react";
 
 const StudentAssignmentPage = () => {
   const { classId, assignmentId } = useParams();
   const navigate = useNavigate();
+  const currentUser = useAuthStore((s) => s.user);
 
   const classroomId = classId ? Number(classId) : null;
   const assignId = assignmentId ? Number(assignmentId) : null;
 
-  const { data: assignment, isLoading, isError } = useAssignment(classroomId, assignId);
+  const { data: assignment, isLoading: isAssignmentLoading, isError: isAssignmentError } = useAssignment(classroomId, assignId);
 
-  const handleStart = () => {
-    navigate(`/classrooms/${classId}/assignments/${assignmentId}/workspace`);
+  const { data: submissions, isLoading: isSubmissionsLoading } = useSubmissions(classroomId, assignId);
+
+  const mySubmission = submissions?.find(
+    (s) => String(s.userId) === String(currentUser?.id)
+  ) ?? null;
+
+  let isSubmitted = mySubmission?.status === "SUBMITTED";
+  const turnedInAt =
+    isSubmitted && mySubmission?.submittedAt
+      ? new Date(mySubmission.submittedAt).toLocaleString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+      : null;
+  
+  const hasSubmission = !!mySubmission;
+
+  const createDraftMutation = useCreateSubmission(classroomId!, assignId!);
+
+
+  const isLoading = isAssignmentLoading || isSubmissionsLoading;
+
+  const handleStartOrResume = async () => {
+    if (!classroomId || !assignId || !currentUser) return;
+
+    try {
+      if (hasSubmission) {
+        navigate(`/classrooms/${classId}/assignments/${assignmentId}/workspace`);
+        return;
+      }
+
+      await createDraftMutation.mutateAsync({ content: "" });
+
+      navigate(`/classrooms/${classId}/assignments/${assignmentId}/workspace`);
+    } catch (err: any) {
+      if (err?.statusCode === 409) {
+        navigate(`/classrooms/${classId}/assignments/${assignmentId}/workspace`);
+      } else {
+        console.error("Failed to create submission draft:", err);
+        alert("Failed to start assignment. Please try again.");
+      }
+    }
   };
 
-  if (isLoading) {
+  useEffect(() => {
+    console.log("currentUser.id:", currentUser?.id, "type:", typeof currentUser?.id);
+    console.log("submissions:", submissions);
+    submissions?.forEach(s => {
+      console.log("submission studentId:", s.userId, "type:", typeof s.userId);
+    });
+  }, [currentUser, submissions]);
+
+  if (isAssignmentLoading || isSubmissionsLoading) {
     return (
       <Panel>
         <div className="flex items-center justify-center h-full text-muted-foreground">
@@ -29,7 +84,7 @@ const StudentAssignmentPage = () => {
     );
   }
 
-  if (isError) {
+  if (isAssignmentError || !assignment) {
     return (
       <Panel>
         <div className="flex items-center justify-center h-full text-destructive">
@@ -39,43 +94,33 @@ const StudentAssignmentPage = () => {
     );
   }
 
-  if (!assignment) {
-    return (
-      <Panel>
-        <div className="flex items-center justify-center h-full text-muted-foreground">
-          No assignment found.
-        </div>
-      </Panel>
-    );
-  }
-
   const formattedDue = assignment.dueAt
-    ? new Date(assignment.dueAt).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-    })
+    ? new Date(assignment.dueAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })
     : "—";
 
   const hasNoChallenges = assignment.assignmentChallenges.length === 0;
-  const firstChallengeId = assignment.assignmentChallenges[0]?.id;
 
   return (
     <Panel>
-      <MainPanel
-        header={
-          <BasePanelHeader
-            left={<h2 className="typo-heading">{assignment.title}</h2>}
-            right={
-              firstChallengeId && (
-                <ButtonPrimary onClick={() => handleStart()}>
-                  Start
-                </ButtonPrimary>
-              )
-            }
-          />
+      <PanelHeader
+        topLeft={<h2 className="typo-heading">{assignment.title}</h2>}
+        topRight={
+          isSubmitted ? (
+            <Button disabled className="bg-green-100 text-green-700 border border-green-200">
+              ✔ Turned in: {turnedInAt}
+            </Button>
+          ) : (
+            <Button
+              onClick={handleStartOrResume}
+              disabled={isLoading || createDraftMutation.isPending}
+            >
+              {hasSubmission ? "Continue / Turn In" : "Start"}
+            </Button>
+          )
         }
-      >
-        {/* Info cards */}
+      />
+
+      <PanelContent>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div className="border border-border rounded-lg p-4">
             <p className="text-sm font-medium mb-2">Description</p>
@@ -97,10 +142,8 @@ const StudentAssignmentPage = () => {
           </div>
         </div>
 
-        {/* Challenges */}
         <div>
           <p className="text-sm font-semibold mb-3">Challenges</p>
-
           {hasNoChallenges ? (
             <div className="text-sm text-muted-foreground text-center py-10">
               No challenges available yet.
@@ -108,17 +151,12 @@ const StudentAssignmentPage = () => {
           ) : (
             <div className="flex flex-col gap-2">
               {assignment.assignmentChallenges.map((challenge, index) => (
-                <ChallengeCard
-                  key={challenge.id}
-                  challenge={challenge}
-                  variant="assignment"
-                  index={index + 1}
-                />
+                <ChallengeCard key={challenge.id} challenge={challenge} variant="assignment" index={index + 1} />
               ))}
             </div>
           )}
         </div>
-      </MainPanel>
+      </PanelContent>
     </Panel>
   );
 };

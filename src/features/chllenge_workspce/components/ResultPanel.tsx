@@ -20,7 +20,7 @@ export default function ResultPanel() {
     ]
 
     return (
-        <Panel className={`border-t bg-[hsl(var(--workspace))] transition-all duration-300}`}>
+        <Panel className={`transition-all duration-300}`}>
             <PanelHeader
                 topLeft={
                     <div className="flex items-center gap-2">
@@ -49,10 +49,8 @@ export default function ResultPanel() {
                 }
             />
             <PanelContent>
-                <div className="p-4">
                     {activeTab === "tests" && <TestResults />}
                     {activeTab === "custom" && <CustomRunner />}
-                </div>
             </PanelContent>
         </Panel>
     )

@@ -7,34 +7,36 @@ import { useAssignmentActions } from "../hooks/useAssignmentActions";
 export default function TopBar({ title }: { title?: string }) {
     const { assignmentId, classroomId } = useParams();
     const navigate = useNavigate();
-    const { saveDraft, submitAssignment } = useAssignmentActions();
+    const { saveDraft, submitAssignment, isDraftDirty, isSaving, isBusy, isSubmitting } = useAssignmentActions();
 
     const handleBack = () => {
         navigate(`/classrooms/${classroomId}/assignments/${assignmentId}`);
     };
 
     return (
-        <div
-            className="
-        flex items-center justify-between
-        px-[var(--spacing-lg)] py-[var(--spacing-md)]
-        border-b border-[hsl(var(--border-strong))]
-        bg-[hsl(var(--workspace))]
-      "
-        >
-            <div className="flex items-center gap-[var(--spacing-md)]">
+        <div className="flex items-center justify-between px-(--spacing-lg) py-(--spacing-md) border-b border-[hsl(var(--border-strong))] bg-[hsl(var(--workspace))]">
+            <div className="flex items-center gap-(--spacing-md)">
                 <Button onClick={handleBack} variant="ghost" size={"icon"}>
                     <WrapIcon icon={ArrowLeft} />
                 </Button>
                 <span className="text-sm font-medium">{title ?? "Untitled Assignment"}</span>
             </div>
 
-            <div className="flex items-center gap-[var(--spacing-sm)]">
+            <div className="flex items-center gap-(--spacing-sm)">
+                <Button
+                    onClick={saveDraft}
+                    variant="secondary"
+                    disabled={!isDraftDirty || isBusy}
+                >
+                    {isSaving ? "Saving..." : "Save Draft"}
+                </Button>
+
                 <Button
                     onClick={submitAssignment}
-                    className="bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] hover:bg-[hsl(var(--primary)/0.85)]"
+                    disabled={isBusy}
+                    className="bg-[hsl(var(--primary))]"
                 >
-                    Submit
+                    {isSubmitting ? "Submitting..." : "Submit"}
                 </Button>
             </div>
         </div>

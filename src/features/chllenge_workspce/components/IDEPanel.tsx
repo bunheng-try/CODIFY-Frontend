@@ -13,37 +13,34 @@ interface IDEPanelProps {
 }
 
 const IDEPanel: React.FC<IDEPanelProps> = ({ challengeId, language = "typescript" }) => {
-    const code = useWorkspaceStore((s) =>
-        challengeId ? s.codes[challengeId] ?? "" : ""
-    );
+    const code = useWorkspaceStore((s) => (challengeId ? s.codes[challengeId] ?? "" : ""));
 
     const setCode = useWorkspaceStore((s) => s.setCode);
-
     const resetCode = useWorkspaceStore((s) => s.resetCode);
+    const dirtySet = new Set(useWorkspaceStore.getState().dirtyChallenges);
+    const isDirty = dirtySet.has(challengeId!);
+
     const [line, setLine] = useState(1);
     const [column, setColumn] = useState(1);
     const [eol, setEol] = useState("LF");
 
-    const handleEditorMount: OnMount = (editor, monaco) => {
+    const handleEditorMount: OnMount = (editor) => {
         editor.onDidChangeCursorPosition((e) => {
             setLine(e.position.lineNumber);
             setColumn(e.position.column);
         });
 
         const model = editor.getModel();
-        if (model) {
-            setEol(model.getEOL() === "\n" ? "LF" : "CRLF");
-        }
+        if (model) setEol(model.getEOL() === "\n" ? "LF" : "CRLF");
     };
 
-
     return (
-        <Panel className="h-full bg-[hsl(var(--panel))] border-l border-[hsl(var(--border))]">
+        <Panel>
             <PanelHeader
                 topLeft={
-                    <div className="flex items-center gap-1 text-sm text-[hsl(var(--muted-foreground))]">
-                        <WrapIcon icon={Code} />
-                        {"Lnaguage: "}{language.toUpperCase()}
+                    <div className="flex items-center gap-2 text-sm text-[hsl(var(--muted-foreground))]">
+                        <WrapIcon icon={Code} size={"sm"} />
+                        <span className="typo-caption">Language: {language}</span>
                     </div>
                 }
                 topRight={
@@ -52,6 +49,7 @@ const IDEPanel: React.FC<IDEPanelProps> = ({ challengeId, language = "typescript
                         size="sm"
                         className="flex items-center gap-1 text-[hsl(var(--muted-foreground))]"
                         onClick={() => resetCode(challengeId!)}
+                        disabled={!isDirty}
                     >
                         <WrapIcon icon={RefreshCw} />
                         Reset
@@ -59,7 +57,7 @@ const IDEPanel: React.FC<IDEPanelProps> = ({ challengeId, language = "typescript
                 }
             />
 
-            <PanelContent>
+            <PanelContent noPadding>
                 <Editor
                     height="100%"
                     defaultLanguage={language}
@@ -75,7 +73,7 @@ const IDEPanel: React.FC<IDEPanelProps> = ({ challengeId, language = "typescript
                 />
             </PanelContent>
 
-            <PanelFooter className="flex justify-end items-center gap-4 text-xs text-[hsl(var(--muted-foreground))]">
+            <PanelFooter className="typo-label flex justify-end items-center gap-4">
                 <div>UTF-8</div>
                 <div>{eol}</div>
                 <div>Ln {line}, Col {column}</div>

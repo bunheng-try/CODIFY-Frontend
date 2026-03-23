@@ -110,12 +110,22 @@ export default function TestCasesTab({ challengeId, draft, updateField, addDraft
                                         <EditableField
                                             value={edited.input ?? tc.input}
                                             onChange={val => markDirty(tc.id, "input", val)}
+                                            multiline
+                                            placeholder={`Each line = one argument
+                                                        Example:
+                                                        1,2,3
+                                                        4,5,6`}
                                         />
                                     </LabeledSection>
                                     <LabeledSection label="Expected Output">
                                         <EditableField
                                             value={edited.expectedOutput ?? tc.expectedOutput}
                                             onChange={val => markDirty(tc.id, "expectedOutput", val)}
+                                            multiline
+                                            placeholder={`Each line = one argument
+                                                        Example:
+                                                        1,2,3
+                                                        4,5,6`}
                                         />
                                     </LabeledSection>
                                     <LabeledSection label="Score">
@@ -160,7 +170,11 @@ export default function TestCasesTab({ challengeId, draft, updateField, addDraft
                         <EditableField
                             value={newTest.input}
                             onChange={(val) => setNewTest({ ...newTest, input: val })}
-                            placeholder="Input"
+                            multiline
+                            placeholder={`Each line = one argument
+                                        Example:
+                                        1,2,3
+                                        4,5,6`}
                             className={errors.input ? "border-red-500" : ""}
                         />
                         <FieldError message={errors.input} />
@@ -170,7 +184,11 @@ export default function TestCasesTab({ challengeId, draft, updateField, addDraft
                         <EditableField
                             value={newTest.expectedOutput}
                             onChange={(val) => setNewTest({ ...newTest, expectedOutput: val })}
-                            placeholder="Expected Output"
+                            multiline
+                            placeholder={`Each line = one argument
+                                        Example:
+                                        1,2,3
+                                        4,5,6`}
                             className={errors.expectedOutput ? "border-red-500" : ""}
                         />
                         <FieldError message={errors.expectedOutput} />

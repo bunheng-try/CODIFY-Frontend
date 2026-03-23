@@ -53,6 +53,7 @@ export const EditableField: React.FC<EditableFieldProps> = ({
                     onChange={(e) => handleChange(e.target.value)}
                     placeholder={placeholder}
                     className={baseClasses}
+                    rows={4}
                 />
             ) : (
                 <input
