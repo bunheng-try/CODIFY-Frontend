@@ -25,6 +25,7 @@ function ChallengeWorkspace() {
   const currentChallengeId = useWorkspaceStore((s) => s.currentChallengeId);
   const setCurrentChallenge = useWorkspaceStore((s) => s.setCurrentChallenge);
   const setStarterCode = useWorkspaceStore((s) => s.setStarterCode);
+  const starterCode = useWorkspaceStore((s) => s.starterCodes);
 
   useEffect(() => {
     if (!assignmentQuery.isSuccess || !assignment || challenges.length === 0) return;
@@ -42,6 +43,7 @@ function ChallengeWorkspace() {
   useEffect(() => {
     if (!currentChallenge?.starterCode) return;
     setStarterCode(currentChallenge.id, currentChallenge.starterCode);
+    console.log(`challenge has changed!!!!!!!!!!!!!!!!!!!! ${starterCode[currentChallengeId!]}`)
   }, [currentChallenge, setStarterCode]);
 
   if (assignmentQuery.isLoading) return <div>Loading assignment...</div>;
@@ -72,7 +74,7 @@ function ChallengeWorkspace() {
           <ResizablePanelDivider />
 
           <ResizablePanel className="min-h-0">
-            <ResultPanel />
+            <ResultPanel currentChallenge={currentChallenge} />
           </ResizablePanel>
         </ResizablePanelContainer>
       </div>

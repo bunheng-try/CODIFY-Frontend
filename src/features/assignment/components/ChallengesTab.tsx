@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { ChallengeCard } from "../components/ChallengeItemCard";
 import { AddChallengeLibraryModal } from "../components/AddChallengeLibraryModal";
 import { SectionContainer } from "@/shared/components/design/SectionContainer";
 import { Button } from "@/shared/components/ui/button";
 import { useChallenges } from "@/features/challenge/hooks/useChallengeQuery";
 import type { Challenge } from "@/features/challenge/apis/challenge.api";
+import { ChallengeCard } from "@/features/challenge/components/ChallengeCard";
 
 interface ChallengeTabProps {
   challenges: Challenge[];
@@ -32,13 +32,11 @@ const ChallengeTab = ({
         </Button>
       </div>
 
-      <div className="flex flex-col">
+      <div className="flex flex-col gap-2">
         {challenges.length > 0 ? (
-          challenges.map((c) => <ChallengeCard key={c.id} challenge={c} />)
+          challenges.map((c) => <ChallengeCard key={c.id} challenge={c}/>)
         ) : (
-          <div className="text-center py-20 border-2 border-dashed border-gray-100 rounded-3xl text-gray-300 font-bold">
-            No challenges added yet. Click "Add Challenge" to get started.
-          </div>
+            <div> No challenges added yet. Click "Add Challenge" to get started. </div>
         )}
       </div>
 

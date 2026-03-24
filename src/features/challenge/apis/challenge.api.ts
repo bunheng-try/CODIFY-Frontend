@@ -1,15 +1,18 @@
+export type Languages = "c" | "python" | "javascript";
+
 export type Challenge = {
   id: number;
   title: string;
   description: string;
   starterCode: string;
-  language: string;
+  language: Languages;
   difficulty: ChallengeLevel;
   tagId?: number;
   tag?: string;
   createdAt: string;
   updatedAt: string;
 };
+
 
 
 export type ChallengeLevel = "EASY" | "MEDIUM" | "HARD";

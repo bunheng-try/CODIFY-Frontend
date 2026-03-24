@@ -48,8 +48,6 @@ export const ChallengeCard = ({
             }
             actions={
               <div className="flex items-center gap-2">
-                <WrapIcon icon={User} size="default" variantColor="default" />
-                <WrapIcon icon={Star} size="default" variantColor="default" />
                 <WrapIcon icon={MoreVertical} size="default" variantColor="default" />
               </div>
             }

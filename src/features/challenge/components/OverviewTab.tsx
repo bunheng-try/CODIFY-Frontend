@@ -1,4 +1,4 @@
-import type { ChallengeDto, ChallengeLevel } from "../apis/challenge.api";
+import type { ChallengeDto, ChallengeLevel, Languages } from "../apis/challenge.api";
 import { SectionContainer } from "@/shared/components/design/SectionContainer";
 import { LabeledSection } from "@/shared/components/design/LabeledSection";
 import { EditableField } from "@/shared/components/design/EditableField";
@@ -10,6 +10,12 @@ interface Props {
 
 export default function OverviewTab({ draft, updateField }: Props) {
     const difficultyOptions: ChallengeLevel[] = ["EASY", "MEDIUM", "HARD"];
+
+    const languageOptions: { label: string; value: Languages }[] = [
+        { label: "C", value: "c" },
+        { label: "JavaScript", value: "javascript" },
+        { label: "Python", value: "python" },
+    ];
 
     return (
         <div className="space-y-8">
@@ -41,12 +47,11 @@ export default function OverviewTab({ draft, updateField }: Props) {
                             focus:ring-[hsl(var(--primary))]
                         "
                     >
-                        <option value="">Select language</option>
-                        <option value="javascript">JavaScript</option>
-                        <option value="typescript">TypeScript</option>
-                        <option value="python">Python</option>
-                        <option value="java">Java</option>
-                        <option value="cpp">C++</option>
+                        {languageOptions.map((lang) => (
+                            <option key={lang.value} value={lang.value}>
+                                {lang.label}
+                            </option>
+                        ))}
                     </select>
                 </LabeledSection>
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Editor, { type OnMount } from "@monaco-editor/react";
 import { useWorkspaceStore } from "../stores/useWorkspaceStore";
 import { Button } from "@/shared/components/ui/button";
@@ -12,8 +12,8 @@ interface IDEPanelProps {
     language?: string;
 }
 
-const IDEPanel: React.FC<IDEPanelProps> = ({ challengeId, language = "typescript" }) => {
-    const code = useWorkspaceStore((s) => (challengeId ? s.codes[challengeId] ?? "" : ""));
+const IDEPanel: React.FC<IDEPanelProps> = ({ challengeId, language = "c" }) => {
+    const code = useWorkspaceStore((s) => s.codes[challengeId!] ?? "");
 
     const setCode = useWorkspaceStore((s) => s.setCode);
     const resetCode = useWorkspaceStore((s) => s.resetCode);
@@ -34,6 +34,9 @@ const IDEPanel: React.FC<IDEPanelProps> = ({ challengeId, language = "typescript
         if (model) setEol(model.getEOL() === "\n" ? "LF" : "CRLF");
     };
 
+    useEffect(() => {
+        console.log(`chllengeID: ${challengeId} language: ${language} code: ${code}`)
+    }, [code])
     return (
         <Panel>
             <PanelHeader

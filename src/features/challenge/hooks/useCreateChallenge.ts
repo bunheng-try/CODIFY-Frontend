@@ -11,7 +11,7 @@ export const useCreateNewChallenge = () => {
                 title: "Untitled Challenge",
                 description: "",
                 starterCode: "",
-                language: "javascript",
+                language: "c",
                 difficulty: "MEDIUM"
             });
 

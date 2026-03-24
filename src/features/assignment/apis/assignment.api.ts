@@ -17,7 +17,11 @@ export interface Assignment {
     sectionId: number;
     createdAt: string;
     updatedAt: string;
-    assignmentChallenges: Challenge[]
+    assignmentChallenges: AssignmentChallenge[]
+}
+
+export interface AssignmentChallenge extends Challenge {
+    originalChallenge_id: number;
 }
 
 export interface CreateAssignmentDto {

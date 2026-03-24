@@ -1,17 +1,27 @@
 import TestCase from "./TestCases"
 
-const testCases = [
-    { id: 1, input: "[1,2,4], [1,3,4]", expected: "[1,1,2,3,4,4]", output: "[1,1,2,3,4,4]", passed: true },
-    { id: 2, input: " 1, 2", expected: "[1,2]", output: "[1,2]", passed: true },
-    { id: 3, input: "Hidden", expected: "Hidden", passed: false, isHidden: true }
-]
+interface ResultType {
+    input: string
+    expected: string
+    output?: string
+    passed: boolean
+    isHidden?: boolean
+}
 
-export default function TestResults() {
+interface TestResultsProps {
+    results: ResultType[]
+}
+
+export default function TestResults({ results }: TestResultsProps) {
+    if (results.length === 0) {
+        return <div className="text-sm text-gray-500">No test results yet.</div>
+    }
+
     return (
         <div className="space-y-2">
-            {testCases.map((t) => (
+            {results.map((t, index) => (
                 <TestCase
-                    key={t.id}
+                    key={index}
                     input={t.input}
                     expected={t.expected}
                     output={t.output}

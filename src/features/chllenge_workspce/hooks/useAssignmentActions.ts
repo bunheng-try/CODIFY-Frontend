@@ -1,9 +1,7 @@
 import { useWorkspaceStore } from "../stores/useWorkspaceStore";
 import { useSubmissions, useCreateSubmission, useUpdateSubmission, useTurnInSubmission } from "@/features/assignment/hooks/useSubmissionQuery";
-
 import { useAuthStore } from "@/app/store/autStore";
 import { useNavigate, useParams } from "react-router-dom";
-import { useEffect } from "react";
 
 export function useAssignmentActions() {
     const { classroomId, assignmentId } = useParams();
@@ -11,7 +9,7 @@ export function useAssignmentActions() {
     const currentUser = useAuthStore((s) => s.user);
     const state = useWorkspaceStore((s) => s);
     
-    const { data: submissions, isLoading: isSubmissionsLoading } = useSubmissions(Number(classroomId), Number(assignmentId));
+    const { data: submissions } = useSubmissions(Number(classroomId), Number(assignmentId));
     const mySubmission = submissions?.find(
         (s) => String(s.userId) === String(currentUser?.id)
     ) ?? null;

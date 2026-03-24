@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/shared/components/ui/button"
 import { Panel, PanelContent } from "@/shared/components/design/Panel"
 import { PanelHeader } from "@/shared/components/design/PanelHeader"
@@ -7,12 +7,66 @@ import { WrapIcon } from "@/shared/components/ui/wrapIcon"
 import { ChevronRight, ChevronLeft, Play } from "lucide-react"
 import TestResults from "./TestResults"
 import CustomRunner from "./CustomRunner"
+import { useWorkspaceStore } from "../stores/useWorkspaceStore"
+import { useRunTestCode, useRunCode, useJobStatus } from "../hooks/useCodeRunnerQuery"
+import type { AssignmentChallenge } from "@/features/assignment/apis/assignment.api"
 
 type Tab = "tests" | "custom"
 
-export default function ResultPanel() {
+export default function ResultPanel({ currentChallenge }: { currentChallenge: AssignmentChallenge }) {
     const [activeTab, setActiveTab] = useState<Tab>("tests")
     const [collapsed, setCollapsed] = useState(false)
+    const [jobId, setJobId] = useState<string | null>(null)
+    const [results, setResults] = useState<any[]>([])
+
+    const code = useWorkspaceStore((s) => s.codes[currentChallenge.id] ?? "")
+
+    const runTestCodeMutation = useRunTestCode()
+    const runCodeMutation = useRunCode()
+    const jobQuery = useJobStatus(jobId)
+
+    const handleRun = async () => {
+        let challengeId = currentChallenge.originalChallenge_id;
+        let language = currentChallenge.language;
+
+        console.log(`challengeid: ${challengeId}, language: ${language}`);
+        console.log(`job status: ${jobQuery.data?.state}`)
+        console.log(`job result: ${jobQuery.data?.result?.results}`)
+
+        if (activeTab === "tests") {
+            const res = await runTestCodeMutation.mutateAsync({
+                challengeId,
+                language,
+                code,
+            })
+            setJobId(res.jobId)
+        } else if (activeTab === "custom") {
+            const res = await runCodeMutation.mutateAsync({
+                language,
+                code,
+            })
+            setJobId(res.jobId)
+        }
+    }
+
+    useEffect(() => {
+        console.log(`job status: ${jobQuery.data?.state}`)
+        console.log(`job result: ${jobQuery.data?.result?.results}`)
+    }, [true])
+    
+    useEffect(() => {
+        if (jobQuery.data?.state === "completed" && jobQuery.data.result?.results) {
+            const newResults = jobQuery.data.result.results.map((tc: any, index: number) => ({
+                input: tc.input ?? `Test case ${index + 1}`,
+                expected: tc.expectedOutput,
+                output: tc.actualOutput,
+                passed: tc.passed,
+                isHidden: tc.isHidden,
+            }));
+
+            setResults(newResults);
+        }
+    }, [jobQuery.data]);
 
     const tabs: TabItem<Tab>[] = [
         { key: "tests", label: "Tests Result" },
@@ -20,7 +74,7 @@ export default function ResultPanel() {
     ]
 
     return (
-        <Panel className={`transition-all duration-300}`}>
+        <Panel className="transition-all duration-300">
             <PanelHeader
                 topLeft={
                     <div className="flex items-center gap-2">
@@ -38,10 +92,10 @@ export default function ResultPanel() {
                     <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => console.log("Run Code")}
+                        onClick={handleRun}
                         className="text-[hsl(var(--primary))]"
                     >
-                        <WrapIcon icon={Play} /> RunCode
+                        <WrapIcon icon={Play} /> Run
                     </Button>
                 }
                 tabs={
@@ -49,8 +103,8 @@ export default function ResultPanel() {
                 }
             />
             <PanelContent>
-                    {activeTab === "tests" && <TestResults />}
-                    {activeTab === "custom" && <CustomRunner />}
+                {activeTab === "tests" && <TestResults results={results} />}
+                {/* {activeTab === "custom" && <CustomRunner jobId={jobId} />} */}
             </PanelContent>
         </Panel>
     )

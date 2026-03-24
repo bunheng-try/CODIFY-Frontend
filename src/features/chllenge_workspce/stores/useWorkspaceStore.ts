@@ -60,6 +60,13 @@ export const useWorkspaceStore = create<WorkspaceState>()(
 
             clearDirty: () => set({ dirtyChallenges: [] }),
         }),
-        { name: "codify-workspace" }
+        {
+            name: "codify-workspace" ,
+            partialize: (state) => ({
+                codes: state.codes,
+                currentChallengeId: state.currentChallengeId,
+                dirtyChallenges: state.dirtyChallenges,
+            }),
+        }
     )
 );
