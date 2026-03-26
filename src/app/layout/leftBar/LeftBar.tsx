@@ -13,6 +13,8 @@ import { LeftBarClassesError } from "@/features/classes/components/LeftBarClasse
 import { ConfirmDialog } from "@/shared/components/design/dialog"
 import { EditClassDialog } from "@/features/classes/components/EditClassDialog"
 import { UserProfileDropdown } from "@/features/auth/components/UserProfileDropdown"
+import { useAuthStore } from '@/app/store/autStore';
+
 
 export function LeftBar() {
   const navigate = useNavigate()
@@ -22,7 +24,7 @@ export function LeftBar() {
   const { createClassroom, deleteClassroom, editClassroom } = useClassroomActions();
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
   const [classToDelete, setClassToDelete] = useState<number | null>(null)
-
+  const currentUser = useAuthStore((s) => s.user);
   const [openEdit, setOpenEdit] = useState(false);
   const [selectedClass, setSelectedClass] = useState<{
     id: number;
@@ -40,6 +42,10 @@ export function LeftBar() {
     setClassToDelete(id)
     setConfirmDeleteOpen(true)
   }
+
+  useEffect(() => {
+    console.log("user color: ", currentUser?.profile.color)
+  })
 
   return (
     <>
@@ -72,7 +78,7 @@ export function LeftBar() {
             tooltip="Exercise library"
             onClick={() => navigate('challenge-library')}
           />
-          <UserProfileDropdown />
+          <UserProfileDropdown bgColor={currentUser?.profile.color || "var(--primary"}/>
         </div>
       </aside>
 

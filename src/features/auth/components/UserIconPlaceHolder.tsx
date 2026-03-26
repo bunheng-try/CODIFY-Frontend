@@ -22,24 +22,40 @@ const shapeMap = {
     square: 'rounded-none',
 }
 
+function getContrastColor(hexColor: string) {
+    let hex = hexColor.replace('#', '')
+    if (hex.length !== 6) return '#FFFFFF'
+    const r = parseInt(hex.substring(0, 2), 16)
+    const g = parseInt(hex.substring(2, 4), 16)
+    const b = parseInt(hex.substring(4, 6), 16)
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
+    return luminance > 0.5 ? '#000000' : '#FFFFFF'
+}
+
 const UserIconPlaceHolder = ({
     text,
     size = 'lg',
     shape = 'circle',
-    bgColor = 'bg-[hsl(var(--primary))]',
+    bgColor = 'var(--primary)',
     className,
 }: UserIconPlaceHolderProps) => {
     const initials = getInitials(text)
 
+    let textColor = 'inherit'
+    if (/^#?[0-9A-Fa-f]{6}$/.test(bgColor)) {
+        if (!bgColor.startsWith('#')) bgColor = `#${bgColor}`
+        textColor = getContrastColor(bgColor)
+    }
+
     return (
         <div
             className={cn(
-                'flex items-center justify-center font-semibold text-[hsl(var(--primary-foreground))]',
                 sizeMap[size],
                 shapeMap[shape],
-                bgColor,
+                'flex items-center justify-center font-semibold',
                 className
             )}
+            style={{ backgroundColor: bgColor, color: textColor }}
         >
             {initials}
         </div>

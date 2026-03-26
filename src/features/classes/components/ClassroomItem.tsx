@@ -16,11 +16,12 @@ const ClassroomItem = ({ c, selectedClassroomId, onDelete, onEdit }: ClassroomIt
     const navigate = useNavigate();
     const { openMenu } = useContextMenu();
     const { data: roleData } = useClassroomRole(c.id);
+    
   return (
       <div>
           <LeftBarButton
               key={c.id}
-              icon={<span className="h-10 w-10 rounded-md bg-muted flex items-center justify-center text-xs font-semibold text-[hsl(var(--primary-foreground))] bg-[hsl(var(--primary))]"> {getInitials(c.name)} </span>}
+              icon={<span className="h-10 w-10 rounded-md bg-muted flex items-center justify-center text-xs font-semibold text-[hsl(var(--primary-foreground))] bg-[hsl(var(--primary))]"> {getInitials(c.name.toLocaleUpperCase())} </span>}
               tooltip={c.name}
               active={c.id === selectedClassroomId}
               onClick={() => navigate(`/classrooms/${c.id}`)}

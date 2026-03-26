@@ -15,6 +15,8 @@ import { useLeaveClassroom, useMembers } from "../../class/hooks/useMemberQuery"
 import { GraduationCap, Plus } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import SettingsMenu from "./SettingMenu";
+import { AssignementEmptyState } from "@/features/assignment/components/empty/AssignementEmptyState";
+import { getInitials } from "@/shared/utils/strings";
 
 type DialogKey = "edit" | "create" | "delete" | "leave";
 
@@ -70,6 +72,12 @@ const MainBarClassroom = () => {
       { key: "Active", label: "Active" },
       { key: "Draft", label: "Draft" },
     ];
+  
+  
+
+  if (!classroom) {
+    navigate("/")
+  }
 
   return (
     <>
@@ -78,7 +86,7 @@ const MainBarClassroom = () => {
           topLeft={
             <>
               <div className="flex items-center justify-center min-w-11 min-h-11 bg-[hsl(var(--primary))] rounded-lg text-white font-bold text-lg">
-                {classroom?.name?.substring(0, 2).toUpperCase()}
+                {getInitials(classroom?.name?.toUpperCase() || "C")}
               </div>
               <h2 className="typo-title truncate">{classroom?.name}</h2>
             </>
@@ -124,7 +132,7 @@ const MainBarClassroom = () => {
           {isLoading ? (
             <p>Loading assignments...</p>
           ) : filteredAssignments.length === 0 ? (
-            <p>No assignments found</p>
+            <AssignementEmptyState onCreate={() => openDialog("create")} />
           ) : (
             filteredAssignments
               .slice()

@@ -1,6 +1,6 @@
 import type { Member } from "../../apis/member.api";
 import StudentRow from "../students/Studentrow";
-import EmptyState from "../students/EmptyState";
+import EmptyState from "./NoStudentState";
 
 interface StudentTableProps {
   students: Member[];

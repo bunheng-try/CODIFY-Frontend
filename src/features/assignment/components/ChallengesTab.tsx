@@ -7,6 +7,9 @@ import { Button } from "@/shared/components/ui/button";
 import { useChallenges } from "@/features/challenge/hooks/useChallengeQuery";
 import type { Challenge } from "@/features/challenge/apis/challenge.api";
 import { ChallengeCard } from "@/features/challenge/components/ChallengeCard";
+import NoChallenge from "./empty/NoChallenge";
+import { WrapIcon } from "@/shared/components/ui/wrapIcon";
+import { Plus } from "lucide-react";
 
 interface ChallengeTabProps {
   challenges: Challenge[];
@@ -28,7 +31,7 @@ const ChallengeTab = ({
           Add challenges to your assignment.
         </p>
         <Button onClick={() => setLibraryOpen(true)} disabled={isAdding}>
-          {isAdding ? "Adding..." : "Add Challenge"}
+          {isAdding ? "Adding..." : <WrapIcon icon={Plus} />}
         </Button>
       </div>
 
@@ -36,7 +39,7 @@ const ChallengeTab = ({
         {challenges.length > 0 ? (
           challenges.map((c) => <ChallengeCard key={c.id} challenge={c}/>)
         ) : (
-            <div> No challenges added yet. Click "Add Challenge" to get started. </div>
+          <NoChallenge onAction={() => setLibraryOpen(true)} />
         )}
       </div>
 

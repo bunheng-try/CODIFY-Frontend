@@ -9,6 +9,9 @@ import type { TestCase, CreateTestCaseDto } from "../apis/testcase.api";
 import { SectionContainer } from "@/shared/components/design/SectionContainer";
 import { LabeledSection } from "@/shared/components/design/LabeledSection";
 import { FieldError } from "@/shared/components/design/FieldError";
+import { WrapIcon } from "@/shared/components/ui/wrapIcon";
+import { Plus } from "lucide-react";
+import NoTestCase from "./empty/NoTestCase";
 
 interface Props {
     challengeId: number;
@@ -86,13 +89,11 @@ export default function TestCasesTab({ challengeId, draft, updateField, addDraft
                 <p className="text-sm text-gray-500">
                     Manage the test cases for this challenge.
                 </p>
-                <Button onClick={() => setDialogOpen(true)}>Add Test Case</Button>
+                <Button onClick={() => setDialogOpen(true)}><WrapIcon icon={Plus} /></Button>
             </div>
 
             {draft.length === 0 ? (
-                <div className="px-4 py-6 text-center text-gray-400 text-sm">
-                    No test cases found.
-                </div>
+                <NoTestCase onAction={() => setDialogOpen(true)}/>
             ) : (
                     <div className="space-y-4">
                         {draft.map(tc => {
