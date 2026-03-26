@@ -28,6 +28,10 @@ export interface UpdateSubmissionDto {
     codes: SubmissionCode[];
 }
 
+//Joined with student name
+export interface SubmissionWithStudentName extends Submission {
+    name: string;
+}
 
 import { httpClient } from "@/app/services/httpClient";
 

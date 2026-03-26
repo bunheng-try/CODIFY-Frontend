@@ -14,10 +14,11 @@ import { ConfirmDialog } from "@/shared/components/design/dialog"
 import { EditClassDialog } from "@/features/classes/components/EditClassDialog"
 import { UserProfileDropdown } from "@/features/auth/components/UserProfileDropdown"
 import { useAuthStore } from '@/app/store/autStore';
+import { useGuardedNavigate } from "@/shared/hooks/useGuardedNavigated"
 
 
 export function LeftBar() {
-  const navigate = useNavigate()
+  const navigate = useGuardedNavigate();
   const { classroomId } = useClassroomRoute()
   const { data: classes = [], isLoading, isError, refetch } = useClassrooms()
   const [openCreate, setOpenCreate] = useState(false)

@@ -3,28 +3,34 @@ import { Input } from "@/shared/components/ui/input";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/shared/components/ui/dropdown-menu";
 import { Button } from "@/shared/components/ui/button";
 import { FilterIcon } from "lucide-react";
-import type { Submission } from "@/shared/types/types";
 import { SubmissionCard } from "./SubmissionCard";
+import type { SubmissionWithStudentName } from "../apis/submission.api";
 
 interface SubmissionsTabProps {
-  submissions: Submission[];
+  submissions: SubmissionWithStudentName[];
+  isLoading: boolean;
+  isError: boolean;
 }
 
-export const SubmissionsTab = ({ submissions }: SubmissionsTabProps) => {
+export const SubmissionsTab = ({ submissions, isError, isLoading }: SubmissionsTabProps) => {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"name" | "date">("name");
 
   const filteredSubmissions = submissions
-    .filter((sub) => sub.studentName.toLowerCase().includes(search.toLowerCase()))
+    .filter((sub) =>
+      sub.name.toLowerCase().includes(search.toLowerCase())
+    )
     .sort((a, b) => {
       if (filter === "date") {
-        return new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime();
+        const dateA = new Date(a.submittedAt ?? a.createdAt).getTime();
+        const dateB = new Date(b.submittedAt ?? b.createdAt).getTime();
+        return dateB - dateA;
       }
-      return a.studentName.localeCompare(b.studentName);
+      return a.name.localeCompare(b.name);
     });
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-4">
       <div className="flex items-center gap-4">
         <div className="flex-1 relative">
           <Input

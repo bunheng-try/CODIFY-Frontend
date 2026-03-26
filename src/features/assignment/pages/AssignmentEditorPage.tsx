@@ -7,9 +7,12 @@ import { useClassroomRoute } from "@/features/classes/hooks/useClassroomRoute";
 import { useClassroomRole } from "@/features/classes/hooks/useClassroomRole";
 import { Panel, PanelContent } from "@/shared/components/design/Panel";
 import { useAssignmentEditorDirty } from "../hooks/useAssignmentEditorDirty";
-import { mockSubmissions } from "@/shared/types/types";
 import { useChallengesDirty } from "../hooks/useChallengeDirty";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
+import { useUnsavedChangesStore } from "@/shared/store/UnsavedChangesStore";
+import { useSubmissions } from "../hooks/useSubmissionQuery";
+import { useMembers } from "@/features/class/hooks/useMemberQuery";
+import type { SubmissionWithStudentName } from "../apis/submission.api";
 
 const AssignmentEditor = () => {
   const { activeTab } = useAssignmentTabs();
@@ -36,28 +39,77 @@ const AssignmentEditor = () => {
     cancel: cancelChallenge,
   } = useChallengesDirty(assignmentId, classroomId, draft?.assignmentChallenges || []);
 
+  const { data: submissions = [], isLoading: isSubmissionsLoading, isError: isSubmissionsError } =
+    useSubmissions(classroomId, assignmentId);
+
+  const { data: members = [], isLoading: isMembersLoading, isError: isMembersError } =
+    useMembers(classroomId);
+
+  const submissionsWithNames: SubmissionWithStudentName[] = useMemo(() => {
+    if (isSubmissionsLoading || isMembersLoading) return [];
+    if (!members.length) return [];
+
+    return submissions.map((sub) => ({
+      ...sub,
+      name: members.find((m) => m.userId === sub.userId)?.name ?? "Unknown",
+    }));
+  }, [submissions, members, isSubmissionsLoading, isMembersLoading]);
+  
+
+  useEffect(() => {
+    console.log("Submissions:", submissions);
+    console.log("Submission userIds:", submissions.map(s => s.userId));
+
+    console.log("Members:", members);
+    console.log("Member ids:", members.map(m => m.userId));
+  }, [submissions, members, isSubmissionsLoading, isMembersLoading])
+
+  const setHasUnsavedChanges = useUnsavedChangesStore(
+    (s) => s.setHasUnsavedChanges
+  );
+
+  const hasUnsavedChanges = isDirty || hasUnsavedChallenge;
+
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (!hasUnsavedChanges) return;
+      e.preventDefault();
+      e.returnValue = "";
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [hasUnsavedChanges, isDirty, hasUnsavedChallenge, setHasUnsavedChanges]);
+  
   if (isLoading || !draft) {
     return <div className="p-6 text-muted-foreground">Loading assignment...</div>;
   }
 
-
   const handleCancelAll = () => {
     cancel();
-    if (hasUnsavedChallenge) cancelChallenge();
+
+    if (hasUnsavedChallenge) {
+      cancelChallenge();
+    }
+
+    setHasUnsavedChanges(false);
   };
 
   const handleSaveAll = async () => {
-
     await save();
-    if (hasUnsavedChallenge) saveChallenge(); 
-  };
 
+    if (hasUnsavedChallenge) {
+      await saveChallenge();
+    }
+
+    setHasUnsavedChanges(false);
+  };
   return (
     <Panel>
       <AssignmentHeader
         classroomId={classroomId}
         assignment={draft}
-        isDirty={isDirty || hasUnsavedChallenge}
+        isDirty={hasUnsavedChanges}
         updateField={updateField}
         save={handleSaveAll}
         cancel={handleCancelAll}
@@ -77,7 +129,11 @@ const AssignmentEditor = () => {
         )}
 
         {isAdmin && activeTab === "submission" && (
-          <SubmissionsTab submissions={mockSubmissions ?? []} />
+          <SubmissionsTab
+            submissions={submissionsWithNames}
+            isLoading={isSubmissionsLoading || isMembersLoading}
+            isError={isSubmissionsError || isMembersError}
+          />
         )}
       </PanelContent>
     </Panel>

@@ -1,7 +1,7 @@
 import { httpClient } from "@/app/services/httpClient";
 
 export type Member = {
-    id: number;
+    userId: number;
     role: "STUDENT" | "OWNER" | "TEACHER";
     name: string;
     email: string;

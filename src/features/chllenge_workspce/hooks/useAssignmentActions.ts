@@ -78,7 +78,10 @@ export function useAssignmentActions() {
         }
 
         await turnInMutation.mutateAsync();
-
+        
+        useWorkspaceStore.persist.clearStorage();
+        useWorkspaceStore.setState({ codes: {}, starterCodes: {}, dirtyChallenges: [] });
+        
         navigate(`/classrooms/${classroomId}/assignments/${assignmentId}`);
     };
 

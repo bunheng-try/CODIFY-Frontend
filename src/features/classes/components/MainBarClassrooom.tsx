@@ -17,11 +17,13 @@ import { Button } from "@/shared/components/ui/button";
 import SettingsMenu from "./SettingMenu";
 import { AssignementEmptyState } from "@/features/assignment/components/empty/AssignementEmptyState";
 import { getInitials } from "@/shared/utils/strings";
+import { useGuardedNavigate } from "@/shared/hooks/useGuardedNavigated";
+import { useSubmissions } from "@/features/assignment/hooks/useSubmissionQuery";
 
 type DialogKey = "edit" | "create" | "delete" | "leave";
 
 const MainBarClassroom = () => {
-  const navigate = useNavigate();
+  const navigate = useGuardedNavigate();
   const { classroomId, assignmentId } = useClassroomRoute();
   const { data: classroom } = useSelectedClassroom(classroomId);
   const { deleteClassroom, editClassroom } = useClassroomActions();
@@ -34,6 +36,13 @@ const MainBarClassroom = () => {
     delete: false,
     leave: false,
   });
+  
+  const { data: members = [], isLoading: isMembersLoading, isError: isMembersError } =
+    useMembers(classroomId);
+  
+  const totalStudents = members.filter((m) => m.role === "STUDENT").length;
+
+  
   const openDialog = (key: DialogKey) => setDialogs((prev) => ({ ...prev, [key]: true }));
   const closeDialog = (key: DialogKey) => setDialogs((prev) => ({ ...prev, [key]: false }));
 
@@ -45,7 +54,6 @@ const MainBarClassroom = () => {
   }, [classroomId, isStudent]);
 
   const { data: assignments = [], isLoading } = useAssignmentClassrooms(classroomId);
-  const { data: members = [] } = useMembers(classroomId);
 
   const filteredAssignments = useMemo(() => {
     return assignments.filter((a) => {
@@ -134,18 +142,18 @@ const MainBarClassroom = () => {
           ) : filteredAssignments.length === 0 ? (
             <AssignementEmptyState onCreate={() => openDialog("create")} />
           ) : (
-            filteredAssignments
-              .slice()
-              .sort((a, b) => a.id - b.id)
-              .map((a) => (
+            filteredAssignments.map((a) => {
+              return (
                 <AssignmentCard
                   key={a.id}
                   assignment={a}
                   isSelect={a.id === assignmentId}
                   onClick={() => navigate(`/classrooms/${classroomId}/assignments/${a.id}`)}
-                  totalStudent={67}
+                  totalStudent={totalStudents}
+                  classroomId={classroomId}
                 />
-              ))
+              );
+            })
           )}
         </PanelContent>
       </Panel>

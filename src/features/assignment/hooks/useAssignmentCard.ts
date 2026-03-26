@@ -3,17 +3,19 @@ import type { Assignment } from "@/features/assignment/apis/assignment.api";
 interface UseAssignmentCardProps {
   assignment: Assignment;
   totalStudent: number;
+  totalSubmitted: number
 }
 
 export const useAssignmentCard = ({
   assignment,
   totalStudent,
+  totalSubmitted
 }: UseAssignmentCardProps) => {
 
   const status = assignment.isPublished ? "Published" : "Draft";
 
   const submissions = assignment.isPublished
-    ? `Submitted: ${10}/${totalStudent}`
+    ? `Submitted: ${totalSubmitted || 0}/${totalStudent}`
     : "Inactive";
 
   const formatDueDate = () => {

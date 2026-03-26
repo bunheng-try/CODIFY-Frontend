@@ -1,16 +1,18 @@
 import { Card, CardHeader, CardMeta } from "@/shared/components/design/Card";
 import { Badge } from "@/shared/components/ui/badge";
 import { Check, Clock, AlertTriangle } from "lucide-react";
-import type { Submission } from "@/shared/types/types";
+import type {  } from "@/shared/types/types";
+import { getInitials } from "@/shared/utils/strings";
+import type { SubmissionWithStudentName } from "../apis/submission.api";
 
 interface SubmissionCardProps {
-  submission: Submission;
+  submission: SubmissionWithStudentName;
 }
 
 export const SubmissionCard = ({ submission }: SubmissionCardProps) => {
-  const { studentName, submittedAt, status, score } = submission;
+  const { name, submittedAt, status, totalScore, createdAt } = submission;
 
-  const formattedDate = new Date(submittedAt).toLocaleString("en-GB", {
+  const formattedDate = new Date(submittedAt ?? createdAt).toLocaleString("en-GB", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
@@ -19,32 +21,21 @@ export const SubmissionCard = ({ submission }: SubmissionCardProps) => {
     hour12: true,
   });
 
-  const initials = studentName
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
+  const initials = getInitials(name)
 
   const getStatus = () => {
     switch (status) {
-      case "graded":
+      case "SUBMITTED":
         return {
           label: "Graded",
           variant: "status-published",
           icon: Check,
         };
-      case "pending":
+      case "DRAFT":
         return {
           label: "Pending",
           variant: "secondary",
           icon: Clock,
-        };
-      case "late":
-        return {
-          label: "Late",
-          variant: "destructive",
-          icon: AlertTriangle,
         };
       default:
         return {
@@ -58,7 +49,7 @@ export const SubmissionCard = ({ submission }: SubmissionCardProps) => {
   const config = getStatus();
 
   return (
-    <Card>
+    <Card >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-[var(--spacing-md)]">
           <div className="w-10 h-10 rounded-full bg-[hsl(var(--surface-muted))] flex items-center justify-center font-medium">
@@ -66,7 +57,7 @@ export const SubmissionCard = ({ submission }: SubmissionCardProps) => {
           </div>
 
           <div>
-            <p className="typo-body font-medium">{studentName}</p>
+            <p className="typo-body font-medium">{name}</p>
             <p className="typo-caption">
               Submitted {formattedDate}
             </p>
@@ -79,9 +70,9 @@ export const SubmissionCard = ({ submission }: SubmissionCardProps) => {
             {config.label}
           </Badge>
 
-          {status === "graded" && score != null && (
+          {status === "SUBMITTED" && totalScore != null && (
             <span className="typo-body-sm text-[hsl(var(--primary))] font-medium">
-              {score}%
+              {totalScore}%
             </span>
           )}
         </div>
