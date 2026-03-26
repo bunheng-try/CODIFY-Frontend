@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useChallenges } from "../hooks/useChallengeQuery";
 import { ChallengeCard } from "./ChallengeCard";
-import { ChallengeEmptyState } from "./inused/ChallengeEmptyState";
+import { ChallengeEmptyState } from "./empty/ChallengeEmptyState";
 import { Input } from "@/shared/components/ui/input";
 import { Panel, PanelContent } from "@/shared/components/design/Panel";
 import { PanelHeader } from "@/shared/components/design/PanelHeader";

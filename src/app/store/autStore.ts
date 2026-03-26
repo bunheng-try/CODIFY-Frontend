@@ -1,8 +1,9 @@
+import type { User } from "@/features/auth/apis/auth.api";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
 type AuthState = {
-    user: { id: number; name: string; email: string } | null;
+    user: User | null;
     token: string | null;
     setAuth: (user: AuthState["user"], token: string) => void;
     clearAuth: () => void;

@@ -1,8 +1,11 @@
 import { httpClient } from "@/app/services/httpClient";
 import { useAuthStore } from "@/app/store/autStore";
 
-
-type User = { id: number; name: string; email: string };
+type Profile = {
+  type : string,
+  color : string,
+};
+export type User = { id: number; name: string; email: string; profile: Profile };
 type AuthResponse = { access_token: string; user: User };
 
 export const authApi = {
