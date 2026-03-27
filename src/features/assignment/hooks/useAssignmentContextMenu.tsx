@@ -1,12 +1,6 @@
 import { useMemo, useState } from "react";
 import type React from "react";
-import {
-    Eye,
-    Edit,
-    Trash2,
-    Upload,
-    Download,
-} from "lucide-react";
+import { Eye, Edit, Trash2, Upload } from "lucide-react";
 
 import type { Assignment } from "@/features/assignment/apis/assignment.api";
 import type { ContextMenuItem } from "@/shared/components/context-menu/types";
@@ -16,7 +10,6 @@ type UseAssignmentContextMenuProps = {
     isStudent: boolean;
     navigate: (to: string) => void;
     publishAssignment: (args: { classroomId: number; assignmentId: number }) => void;
-    unPublishAssignment: (args: { classroomId: number; assignmentId: number }) => void;
     onRequestDelete: (assignment: Assignment) => void;
 };
 
@@ -25,7 +18,6 @@ export function useAssignmentContextMenu({
     isStudent,
     navigate,
     publishAssignment,
-    unPublishAssignment,
     onRequestDelete,
 }: UseAssignmentContextMenuProps) {
     const [contextMenu, setContextMenu] = useState<{
@@ -39,7 +31,6 @@ export function useAssignmentContextMenu({
         assignment: Assignment
     ) => {
         e.preventDefault();
-
         setContextMenu({
             x: e.clientX,
             y: e.clientY,
@@ -54,81 +45,63 @@ export function useAssignmentContextMenu({
 
         const a = contextMenu.assignment;
 
-        const baseItems: ContextMenuItem[] = [
+        const items: ContextMenuItem[] = [
             {
                 type: "item",
                 label: "Open",
                 icon: <Eye className="w-4 h-4" />,
-        onClick: () => {
+                onClick: () => {
                     navigate(`/classrooms/${classroomId}/assignments/${a.id}`);
                     closeContextMenu();
                 },
             },
         ];
 
-        if (isStudent) return baseItems;
-
-        return [
-            ...baseItems,
-            {
+        if (!isStudent) {
+            // Edit option
+            items.push({
                 type: "item",
                 label: "Edit",
                 icon: <Edit className="w-4 h-4" />,
-        onClick: () => {
+                onClick: () => {
                     navigate(`/classrooms/${classroomId}/assignments/${a.id}`);
                     closeContextMenu();
                 },
-            },
-            {
-                type: "item",
-                label: a.isPublished ? "Unpublish" : "Publish",
-                icon: a.isPublished ? (
-                    <Download className= "w-4 h-4" />
-        ) : (
-        <Upload className= "w-4 h-4" />
-        ),
-    onClick: () => {
-        if (a.isPublished) {
-            unPublishAssignment({
-                classroomId,
-                assignmentId: a.id,
             });
-        } else {
-            publishAssignment({
-                classroomId,
-                assignmentId: a.id,
+
+            if (!a.isPublished) {
+                items.push({
+                    type: "item",
+                    label: "Publish",
+                    icon: <Upload className="w-4 h-4" />,
+                    onClick: () => {
+                        publishAssignment({ classroomId, assignmentId: a.id });
+                        closeContextMenu();
+                    },
+                });
+            }
+
+            items.push({ type: "separator" });
+
+            items.push({
+                type: "item",
+                label: "Delete",
+                icon: <Trash2 className="w-4 h-4" />,
+                danger: true,
+                onClick: () => {
+                    onRequestDelete(a);
+                    closeContextMenu();
+                },
             });
         }
 
-        closeContextMenu();
-    },
-      },
-{ type: "separator" },
-{
-    type: "item",
-        label: "Delete",
-            icon: <Trash2 className="w-4 h-4" />,
-                danger: true,
-                    onClick: () => {
-                        onRequestDelete(a);
-                        closeContextMenu();
-                    },
-      },
-    ];
-  }, [
-    contextMenu,
-    classroomId,
-    isStudent,
-    navigate,
-    publishAssignment,
-    unPublishAssignment,
-    onRequestDelete,
-]);
+        return items;
+    }, [contextMenu, classroomId, isStudent, navigate, publishAssignment, onRequestDelete]);
 
-return {
-    contextMenu,
-    contextMenuItems,
-    handleAssignmentContextMenu,
-    closeContextMenu,
-};
+    return {
+        contextMenu,
+        contextMenuItems,
+        handleAssignmentContextMenu,
+        closeContextMenu,
+    };
 }

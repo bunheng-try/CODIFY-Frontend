@@ -103,7 +103,6 @@ const MainBarClassroom = () => {
     isStudent,
     navigate,
     publishAssignment,
-    unPublishAssignment,
     onRequestDelete: (assignment) => setAssignmentToDelete(assignment),
   });
 

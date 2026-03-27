@@ -20,9 +20,10 @@ type Props = {
   updateField: <K extends keyof Assignment>(key: K, value: Assignment[K]) => void;
   save: () => void;
   cancel: () => void;
+  onDeleteRequest: () => void;
 };
 
-const AssignmentHeader = ({ classroomId, isDirty, assignment, updateField, save, cancel }: Props) => {
+const AssignmentHeader = ({ classroomId, isDirty, assignment, updateField, save, cancel, onDeleteRequest }: Props) => {
   const { activeTab, setActiveTab } = useAssignmentTabs();
   const { mutate: publishAssignment } = usePublishAssignment();
 
@@ -81,12 +82,12 @@ const AssignmentHeader = ({ classroomId, isDirty, assignment, updateField, save,
               </>
             ) : !showPublishedUI ? (
               <>
+                  <Button variant="secondary" onClick={onDeleteRequest}>Delete</Button>
                 <Button variant="default" onClick={handlePublish}>Publish</Button>
-                <Button variant="secondary" onClick={() => console.log("Delete assignment")}>Delete</Button>
               </>
             ) : (
               <>
-                <Button variant="secondary" onClick={() => console.log("Delete assignment")}>Delete</Button>
+                    <Button variant="secondary" onClick={onDeleteRequest}>Delete</Button>
               </>
             )}
           </>

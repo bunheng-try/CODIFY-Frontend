@@ -8,17 +8,32 @@ import { useClassroomRole } from "@/features/classes/hooks/useClassroomRole";
 import { Panel, PanelContent } from "@/shared/components/design/Panel";
 import { useAssignmentEditorDirty } from "../hooks/useAssignmentEditorDirty";
 import { useChallengesDirty } from "../hooks/useChallengeDirty";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useUnsavedChangesStore } from "@/shared/store/UnsavedChangesStore";
 import { useSubmissions } from "../hooks/useSubmissionQuery";
 import { useMembers } from "@/features/class/hooks/useMemberQuery";
 import type { SubmissionWithStudentName } from "../apis/submission.api";
+import { useNavigate } from "react-router-dom";
+import { useDeleteAssignment } from "../hooks/useAssignmentQuery";
+import { ConfirmDialog } from "@/shared/components/design/dialog/ConfirmDialog";
 
 const AssignmentEditor = () => {
   const { activeTab } = useAssignmentTabs();
   const { classroomId, assignmentId } = useClassroomRoute();
   const { data: roleData } = useClassroomRole(classroomId);
   const isAdmin = roleData?.role === "OWNER";
+  const navigate = useNavigate();
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
+  const { mutate: deleteAssignment, isPending: isDeleting } = useDeleteAssignment();
+
+  const handleDelete = () => {
+    deleteAssignment({classroomId, assignmentId}, {
+      onSuccess: () => {
+        navigate(`/classrooms/${classroomId}`);
+      },
+    });
+  };
 
   const {
     draft,
@@ -105,6 +120,7 @@ const AssignmentEditor = () => {
     setHasUnsavedChanges(false);
   };
   return (
+    <>
     <Panel>
       <AssignmentHeader
         classroomId={classroomId}
@@ -113,7 +129,7 @@ const AssignmentEditor = () => {
         updateField={updateField}
         save={handleSaveAll}
         cancel={handleCancelAll}
-
+        onDeleteRequest={() => setConfirmOpen(true)}
       />
 
       <PanelContent>
@@ -136,7 +152,22 @@ const AssignmentEditor = () => {
           />
         )}
       </PanelContent>
-    </Panel>
+      </Panel>
+      
+      <ConfirmDialog
+        open={confirmOpen}
+        onOpenChange={(open) => {setConfirmOpen(!open)}}
+        title="Delete Assignment"
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={handleDelete}
+      >
+        <p>
+          Are you sure you want to delete{" "}
+          <strong>{draft?.title}</strong>?
+        </p>
+      </ConfirmDialog>
+    </>
   );
 };
 

@@ -6,8 +6,7 @@ import type { CreateAssignmentDto } from "../apis/assignment.api";
 export const useCreateAssignmentForm = (classroomId: number) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-
-  // const { setCreateDialogOpen } = useAssignmentUIStore();
+  const [error, setError] = useState<string | null>(null);
 
   const {
     mutate: createAssignment,
@@ -15,8 +14,11 @@ export const useCreateAssignmentForm = (classroomId: number) => {
     isError,
   } = useCreateAssignment(classroomId);
 
-  const handleSubmit = (onSuccessCallback?: () => void) => {
-    if (!title.trim()) return;
+  const handleSubmit = async (onSuccessCallback?: () => void) => {
+    if (title.trim().length < 2) {
+      setError("Title must be at least 2 characters.");
+      return;
+    }
 
     const dto: CreateAssignmentDto = {
       classroomId,
@@ -28,13 +30,14 @@ export const useCreateAssignmentForm = (classroomId: number) => {
       position: 0,
     };
 
-    createAssignment(dto, {
-      onSuccess: () => {
-        setTitle("");
-        setDescription("");
-        onSuccessCallback?.();
-      },
-    });
+    try {
+      await createAssignment(dto);
+      setTitle("");
+      setDescription("");
+      onSuccessCallback?.();
+    } catch (err: any) {
+      setError(err?.message || "Failed to create assignment.");
+    }
   };
 
   return {
@@ -42,8 +45,10 @@ export const useCreateAssignmentForm = (classroomId: number) => {
     setTitle,
     description,
     setDescription,
+    error,
     isLoading: isPending,
     isError,
+    setError,
     handleSubmit,
   };
 };
