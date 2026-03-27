@@ -55,12 +55,12 @@ export const SettingsTab = ({ draft, updateField }: SettingsTabProps) => {
               onChange={handleTimeChange}
               icon={<ClockIcon className="w-5 h-5 text-gray-400" />}
               placeholder="Select due time"
-              type="time" // <--- specify type
+              type="time"
             />
           </LabeledSection>
 
           <LabeledSection label="Points">
-            <span>{draft.points ?? "Not set"}</span>
+            Timer option with toggle button
           </LabeledSection>
 
           <LabeledSection label="Status">

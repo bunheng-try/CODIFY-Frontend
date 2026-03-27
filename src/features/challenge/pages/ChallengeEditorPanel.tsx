@@ -15,6 +15,7 @@ import { useTestCasesDirty } from "../hooks/useTestCaseDirty";
 import type { EditorTab } from "../components/tabs";
 import { PanelHeader } from "@/shared/components/design/PanelHeader";
 import { Panel, PanelContent } from "@/shared/components/design/Panel";
+import PanelSkeleton from "@/shared/components/loading-skeleton/PanelSkeleton";
 
 export default function ChallengeEditorPanel() {
     const { challengeId } = useParams();
@@ -42,7 +43,7 @@ export default function ChallengeEditorPanel() {
     const [activeTab, setActiveTab] = useState<EditorTab>("overview");
 
     if (isLoading || !draft) {
-        return <div className="p-6 text-center text-gray-500">Loading challenge...</div>;
+        return <PanelSkeleton />;
     }
 
     const tabs = [

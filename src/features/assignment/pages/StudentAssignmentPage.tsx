@@ -7,6 +7,7 @@ import { useSubmissions } from "../hooks/useSubmissionQuery";
 import { useAssignment } from "../hooks/useAssignmentQuery";
 import { useCreateSubmission } from "../hooks/useSubmissionQuery";
 import { useAuthStore } from "@/app/store/autStore";
+import PanelSkeleton from "@/shared/components/loading-skeleton/PanelSkeleton";
 
 const StudentAssignmentPage = () => {
   const { classId, assignmentId } = useParams();
@@ -64,11 +65,7 @@ const StudentAssignmentPage = () => {
 
   if (isAssignmentLoading || isSubmissionsLoading) {
     return (
-      <Panel>
-        <div className="flex items-center justify-center h-full text-muted-foreground">
-          Loading assignment...
-        </div>
-      </Panel>
+      <PanelSkeleton />
     );
   }
 
