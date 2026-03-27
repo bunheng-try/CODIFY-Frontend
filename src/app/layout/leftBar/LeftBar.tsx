@@ -70,7 +70,7 @@ export function LeftBar() {
         <div className="flex-1" />
 
       
-        <div className="flex flex-col gap-1 px-2 py-2 items-center justify-end">
+        <div className="flex flex-col gap-1 py-2 items-center justify-end w-full">
           <LeftBarButton
             icon={<Plus className="h-5 w-5" />}
             tooltip="Create class"

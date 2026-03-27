@@ -1,16 +1,10 @@
 import React from "react";
 import SkeletonBox from "./SkeletonBox";
+import HeaderSkeleton from "./HeaderSkeleton";
 
 const PanelSkeleton: React.FC = () => (
   <div className="flex flex-col gap-5 p-6">
-    {/* Header */}
-    <div className="flex items-center justify-between">
-      <SkeletonBox width={220} height={24} borderRadius={6} />
-      <div className="flex gap-2">
-        <SkeletonBox width={80} height={32} borderRadius={6} />
-        <SkeletonBox width={80} height={32} borderRadius={6} />
-      </div>
-    </div>
+    <HeaderSkeleton />
 
     {/* Section blocks */}
     {[1, 2, 3].map((i) => (

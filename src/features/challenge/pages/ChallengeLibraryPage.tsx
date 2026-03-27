@@ -5,6 +5,7 @@ import { ChallengeLibraryBar } from "../components/ChallengeLibraryBar";
 import { useCreateNewChallenge } from "../hooks/useCreateChallenge";
 import { useDeleteChallenge } from "../hooks/useChallengeQuery";
 import { ConfirmDialog } from "@/shared/components/design/dialog/ConfirmDialog";
+import PanelSkeleton from "@/shared/components/loading-skeleton/PanelSkeleton";
 
 export const ChallengeLibraryPage = () => {
     const { isCreating, createNewChallenge } = useCreateNewChallenge();
@@ -57,9 +58,7 @@ export const ChallengeLibraryPage = () => {
                 {/* MAIN PANEL */}
                 <ResizablePanel defaultSize={65} minSize={55} maxSize={75}>
                     {isCreating ? (
-                        <div className="flex items-center justify-center h-full text-gray-500 text-sm">
-                            Creating new challenge...
-                        </div>
+                        <PanelSkeleton />
                     ) : (
                         <Outlet />
                     )}

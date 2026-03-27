@@ -10,6 +10,7 @@ import { Plus } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ContextMenu } from "@/shared/components/context-menu/ContextMenu";
 import { useChallengeContextMenu } from "../hooks/useChallengeContextMenu";
+import ListSkeleton from "@/shared/components/loading-skeleton/ListSkeleton";
 
 interface ChallengeLibraryBarProps {
   onCreateChallenge: () => void;
@@ -46,8 +47,6 @@ export const ChallengeLibraryBar = ({
     onRequestDelete: onRequestDeleteChallenge,
   });
 
-  if (isLoading) return <div className="p-6">Loading...</div>;
-
   return (
     <Panel className="h-full flex flex-col">
       <PanelHeader
@@ -60,7 +59,7 @@ export const ChallengeLibraryBar = ({
         bottomContent={
           <>
             <span className="typo-caption">
-              {challenges.length} Challenge{challenges.length !== 1 ? "s" : ""}
+              {isLoading ? "Loading..." : `${challenges.length} Challenge${challenges.length !== 1 ? "s" : ""}`}
             </span>
             <Input
               placeholder="Search challenge..."
@@ -73,7 +72,9 @@ export const ChallengeLibraryBar = ({
       />
 
       <PanelContent className="flex flex-col gap-2 p-4">
-        {filtered.length === 0 ? (
+        {isLoading ? (
+          <ListSkeleton />
+        ) : filtered.length === 0 ? (
           <ChallengeEmptyState onCreate={onCreateChallenge} />
         ) : (
           filtered.map((challenge) => (

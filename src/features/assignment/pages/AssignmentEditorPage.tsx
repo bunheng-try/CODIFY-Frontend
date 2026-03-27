@@ -16,6 +16,7 @@ import type { SubmissionWithStudentName } from "../apis/submission.api";
 import { useNavigate } from "react-router-dom";
 import { useDeleteAssignment } from "../hooks/useAssignmentQuery";
 import { ConfirmDialog } from "@/shared/components/design/dialog/ConfirmDialog";
+import PanelSkeleton from "@/shared/components/loading-skeleton/PanelSkeleton";
 
 const AssignmentEditor = () => {
   const { activeTab } = useAssignmentTabs();
@@ -97,7 +98,7 @@ const AssignmentEditor = () => {
   }, [hasUnsavedChanges, isDirty, hasUnsavedChallenge, setHasUnsavedChanges]);
   
   if (isLoading || !draft) {
-    return <div className="p-6 text-muted-foreground">Loading assignment...</div>;
+    return <PanelSkeleton />;
   }
 
   const handleCancelAll = () => {
@@ -119,6 +120,7 @@ const AssignmentEditor = () => {
 
     setHasUnsavedChanges(false);
   };
+
   return (
     <>
     <Panel>

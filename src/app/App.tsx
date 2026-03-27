@@ -6,6 +6,7 @@ import { ContextMenuProvider } from "@/shared/components/context-menu/ContextMen
 
 function App() {
   return (
+    <>
     <ThemeProvider defaultTheme="light">
       <QueryProvider>
         <TooltipProvider delayDuration={200}>
@@ -15,6 +16,7 @@ function App() {
         </TooltipProvider>
       </QueryProvider>
     </ThemeProvider>
+    </>
   );
 }
 

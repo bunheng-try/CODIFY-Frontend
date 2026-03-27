@@ -11,7 +11,7 @@ type Props = {
 export function LeftBarClasses({ classes, selectedClassroomId, onDelete, onEdit }: Props) {
     return (
         <>
-            <div className="flex flex-col gap-0.5 px-2 py-2 overflow-hidden flex-1">
+            <div className="flex flex-col gap-0.5 py-2 overflow-hidden flex-1  w-full">
                 {classes.map((c) => (
                     <ClassroomItem c={c} selectedClassroomId={selectedClassroomId!} onDelete={onDelete} onEdit={onEdit} />
                 ))}

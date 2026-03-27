@@ -17,6 +17,12 @@ import { AssignmentPage } from "@/features/assignment/pages/AssignmentPage";
 import WelcomePage from "../layout/WelcomePage";
 import { LibraryHome } from "@/features/challenge/components/LibraryHome";
 import { NotFoundPage } from "./NotFoundPage";
+import WorkspaceSkeleton from "@/shared/components/loading-skeleton/WorkspaceSkeleton";
+import FormSkeleton from "@/shared/components/loading-skeleton/FormSkeleton";
+import HeaderSkeleton from "@/shared/components/loading-skeleton/HeaderSkeleton";
+import PanelSkeleton from "@/shared/components/loading-skeleton/PanelSkeleton";
+import SkeletonBox from "@/shared/components/loading-skeleton/SkeletonBox";
+import ListSkeleton from "@/shared/components/loading-skeleton/ListSkeleton";
 
 const router = createBrowserRouter([
   { path: "*", element: <NotFoundPage />},
@@ -83,6 +89,12 @@ const router = createBrowserRouter([
     children: [
       { path: "design/buttons", element: <ButtonsShowroom /> },
       { path: "features/code-editor", element: <EditorShowroom /> },
+      { path: "loading-1", element: <WorkspaceSkeleton />},
+      { path: "loading-2", element: <FormSkeleton />},
+      { path: "loading-3", element: <HeaderSkeleton />},
+      { path: "loading-4", element: <PanelSkeleton />},
+      { path: "loading-5", element: <SkeletonBox />},
+      { path: "loading-6", element: <ListSkeleton />},
     ],
   },
 ]);

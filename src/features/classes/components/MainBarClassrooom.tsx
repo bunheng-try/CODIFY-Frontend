@@ -11,9 +11,7 @@ import {
   useAssignmentClassrooms,
   useDeleteAssignment,
   usePublishAssignment,
-  useUnPublishAssignment,
 } from "@/features/assignment/hooks/useAssignmentQuery";
-import { useSelectedClassroom } from "../hooks/useClassroomQuery";
 import { useClassroomActions } from "../hooks/useClassroomAction";
 import { useLeaveClassroom, useMembers } from "../../class/hooks/useMemberQuery";
 import { GraduationCap, Plus } from "lucide-react";
@@ -25,24 +23,28 @@ import { useGuardedNavigate } from "@/shared/hooks/useGuardedNavigated";
 import type { Assignment } from "@/features/assignment/apis/assignment.api";
 import { ContextMenu } from "@/shared/components/context-menu/ContextMenu";
 import { useAssignmentContextMenu } from "@/features/assignment/hooks/useAssignmentContextMenu";
+import ListSkeleton from "@/shared/components/loading-skeleton/ListSkeleton";
+import type { Classroom } from "../apis/classroom.api";
 
 type DialogKey = "edit" | "create" | "delete" | "leave";
 
-const MainBarClassroom = () => {
+interface MainBarClassroomProp {
+  classroom: Classroom;
+}
+
+const MainBarClassroom = ({ classroom }:MainBarClassroomProp) => {
   const navigate = useGuardedNavigate();
   const { classroomId, assignmentId } = useClassroomRoute();
 
   // Queries
-  const { data: classroom } = useSelectedClassroom(classroomId);
   const { data: assignments = [], isLoading } = useAssignmentClassrooms(classroomId);
-  const { data: members = [] } = useMembers(classroomId);
+  const { data: members = [], isLoading: isMembersLoading } = useMembers(classroomId);
 
   // Mutations
   const { deleteClassroom, editClassroom } = useClassroomActions();
   const { mutate: leaveClassroom } = useLeaveClassroom();
   const { mutate: deleteAssignment } = useDeleteAssignment();
   const { mutate: publishAssignment } = usePublishAssignment();
-  const { mutate: unPublishAssignment } = useUnPublishAssignment();
 
   // Local state
   const [selectedClass, setSelectedClass] = useState<{ id: number; name: string } | null>(null);
@@ -148,6 +150,7 @@ const MainBarClassroom = () => {
                   variant="ghost"
                   size="icon"
                   onClick={() => openDialog("create")}
+                  animated
                 >
                   <Plus className="w-5 h-5 text-[hsl(var(--primary))]" />
                 </Button>
@@ -162,7 +165,7 @@ const MainBarClassroom = () => {
               >
                 <GraduationCap className="w-4 h-4" />
                 <span>
-                  {members.length} Member{members.length > 1 ? "s" : ""}
+                  {isMembersLoading ? "Loading..." : `${members.length} Member${members.length > 1 ? "s" : ""}`}
                 </span>
               </div>
             )
@@ -178,8 +181,8 @@ const MainBarClassroom = () => {
 
         <PanelContent className="flex flex-col gap-2 p-4">
           {isLoading ? (
-            <p>Loading assignments...</p>
-          ) : filteredAssignments.length === 0 ? (
+            <ListSkeleton />
+          ): filteredAssignments.length === 0 ? (
             <AssignementEmptyState onCreate={() => openDialog("create")} />
           ) : (
             filteredAssignments.map((a) => (
