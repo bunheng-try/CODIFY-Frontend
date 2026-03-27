@@ -10,6 +10,7 @@ import CustomRunner from "./CustomRunner"
 import { useWorkspaceStore } from "../stores/useWorkspaceStore"
 import { useRunTestCode, useRunCode, useJobStatus } from "../hooks/useCodeRunnerQuery"
 import type { AssignmentChallenge } from "@/features/assignment/apis/assignment.api"
+import { LoadingButton } from "@/shared/components/ui/loadingButton"
 
 type Tab = "tests" | "custom"
 export type RunState = "loading" | "idle";
@@ -91,14 +92,17 @@ export default function ResultPanel({ currentChallenge }: { currentChallenge: As
                     </div>
                 }
                 topRight={
-                    <Button
+                    <LoadingButton
                         size="sm"
+                        spinnerSize={"sm"}
                         variant="outline"
+                        isLoading={isRunning}
+                        loadingText="Running…"
                         onClick={handleRun}
-                        className="text-[hsl(var(--primary))]"
+                        className="text-[hsl(var(--primary))] flex items-center gap-2"
                     >
                         <WrapIcon icon={Play} /> Run
-                    </Button>
+                    </LoadingButton>
                 }
                 tabs={
                     <MenuTabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />

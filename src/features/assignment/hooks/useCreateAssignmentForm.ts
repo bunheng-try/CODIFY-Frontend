@@ -34,6 +34,7 @@ export const useCreateAssignmentForm = (classroomId: number) => {
       await createAssignment(dto);
       setTitle("");
       setDescription("");
+      setError(null);
       onSuccessCallback?.();
     } catch (err: any) {
       setError(err?.message || "Failed to create assignment.");
