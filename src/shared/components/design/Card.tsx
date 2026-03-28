@@ -2,6 +2,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 import { WrapIcon } from "@/shared/components/ui/wrapIcon";
 import type { LucideIcon } from "lucide-react";
+import { hoverScaleGroup, interactiveScale, subtleHoverSurface } from "../motions/interactiveScale";
 
 interface CardProps {
   children: React.ReactNode;
@@ -54,6 +55,9 @@ export const Card: React.FC<CardProps> = ({
         "border-[hsl(var(--border))]",
         clickable && "cursor-pointer hover:bg-[hsl(var(--surface-hover))]",
         isSelected && "bg-[hsl(var(--surface-active))] border-[hsl(var(--primary))]",
+        hoverScaleGroup(),
+        subtleHoverSurface(),
+        interactiveScale(),
         className
       )}
     >

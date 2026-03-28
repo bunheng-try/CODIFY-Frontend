@@ -6,9 +6,8 @@ import { useParams } from "react-router-dom";
 import MenuTabs from "@/shared/components/menu_tabs/MenuTabs";
 import { Button } from "@/shared/components/ui/button";
 
-import OverviewTab from "../components/OverviewTab";
-import StarterCodeTab from "../components/StarterCodeTab";
-import TestCasesTab from "../components/TestCaseTab";
+import OverviewTab from "../components/OverviewTab/OverviewTab";
+import TestCasesTab from "../components/TestCaseTab/TestCaseTab";
 
 import { useChallengeEditorDirty } from "../hooks/useChallengeEditorDirty";
 import { useTestCasesDirty } from "../hooks/useTestCaseDirty";
@@ -16,6 +15,7 @@ import type { EditorTab } from "../components/tabs";
 import { PanelHeader } from "@/shared/components/design/PanelHeader";
 import { Panel, PanelContent } from "@/shared/components/design/Panel";
 import PanelSkeleton from "@/shared/components/loading-skeleton/PanelSkeleton";
+import StarterCodeTab from "../components/StarterCodeTab/StarterCodeTab";
 
 export default function ChallengeEditorPanel() {
     const { challengeId } = useParams();
@@ -36,8 +36,13 @@ export default function ChallengeEditorPanel() {
         updateField: updateTestCase,
         addDraft,
         save: saveTestCase,
-        cancel: cancelTestCase,
         isDirty: isTestCaseDirty,
+        hasDirty,
+        deleteMutation: deleteTestcase,
+        deletedIds,
+        markDeleted,
+        setDeletedIds,
+        resetAll,
     } = useTestCasesDirty(numericChallengeId!);
 
     const [activeTab, setActiveTab] = useState<EditorTab>("overview");
@@ -46,19 +51,18 @@ export default function ChallengeEditorPanel() {
         return <PanelSkeleton />;
     }
 
+    const hasDirtyTestCases = hasDirty();
+
     const tabs = [
         { key: "overview" as EditorTab, label: "Overview" },
         { key: "starter" as EditorTab, label: "Starter Code" },
         { key: "testcases" as EditorTab, label: "Test Cases" },
     ];
-
-    const hasDirtyTestCases = testCaseDraft?.some(tc => isTestCaseDirty(tc.id)) ?? false;
-
     
 
     const handleCancelAll = () => {
         cancel();
-        if (testCaseDraft) testCaseDraft.forEach(tc => cancelTestCase(tc.id));
+        resetAll();
     };
 
     const handleSaveAll = async () => {
@@ -69,6 +73,12 @@ export default function ChallengeEditorPanel() {
                 if (isTestCaseDirty(tc.id)) await saveTestCase(tc.id);
             }
         }
+
+        for (const id of deletedIds) {
+            await deleteTestcase.mutateAsync(id);
+        }
+
+        setDeletedIds([]);
     };
 
     return (
@@ -82,7 +92,7 @@ export default function ChallengeEditorPanel() {
                         </Button>
                         <Button
                             onClick={handleSaveAll}
-                            disabled={!isDirty && !hasDirtyTestCases || isSaving}
+                            disabled={(!isDirty && !hasDirtyTestCases) || isSaving}
                         >
                             Save
                         </Button>
@@ -100,6 +110,7 @@ export default function ChallengeEditorPanel() {
                         draft={testCaseDraft}
                         updateField={updateTestCase}
                         addDraft={addDraft}
+                        markDeleted={markDeleted}
                     />
                 )}
             </PanelContent>

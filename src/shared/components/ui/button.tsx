@@ -51,7 +51,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     // animation classes
     const animationClass = animated
-      ? "transform transition-transform duration-200 ease-out hover:scale-105 active:scale-95"
+      ? "transform transition-transform duration-200 ease-out hover:scale-101 active:scale-95"
       : ""
 
     return (

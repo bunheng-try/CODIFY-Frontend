@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Editor, { type OnChange } from "@monaco-editor/react";
-import type { ChallengeDto } from "../apis/challenge.api";
 import { SectionContainer } from "@/shared/components/design/SectionContainer";
 import { LabeledSection } from "@/shared/components/design/LabeledSection";
+import type { ChallengeDto } from "../../apis/challenge.api";
 
 interface Props {
     draft: ChallengeDto;

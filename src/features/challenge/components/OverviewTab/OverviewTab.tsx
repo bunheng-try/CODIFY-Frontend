@@ -1,4 +1,4 @@
-import type { ChallengeDto, ChallengeLevel, Languages } from "../apis/challenge.api";
+import type { ChallengeDto, ChallengeLevel, Languages } from "../../apis/challenge.api";
 import { SectionContainer } from "@/shared/components/design/SectionContainer";
 import { LabeledSection } from "@/shared/components/design/LabeledSection";
 import { EditableField } from "@/shared/components/design/EditableField";
