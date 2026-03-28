@@ -18,11 +18,10 @@ export function useStudents(classroomId: number | null) {
       students.filter((s) => {
         const lowerSearch = search.toLowerCase();
         if (filterBy === "name") return s.name.toLowerCase().includes(lowerSearch);
-        if (filterBy === "email") return s.id.toString().includes(lowerSearch); // or email if exists
-        // all
+        if (filterBy === "email") return s.email.toLowerCase().includes(lowerSearch);
         return (
           s.name.toLowerCase().includes(lowerSearch) ||
-          s.id.toString().includes(lowerSearch)
+          s.email.toString().includes(lowerSearch)
         );
       }),
     [students, search, filterBy]
@@ -34,7 +33,7 @@ export function useStudents(classroomId: number | null) {
 
   // Export students as CSV
   const exportStudents = () => {
-    const csv = ["Student,ID", ...students.map((s) => `${s.name},${s.id}`)].join("\n");
+    const csv = ["Student,ID", ...students.map((s) => `${s.name},${s.userId}`)].join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");

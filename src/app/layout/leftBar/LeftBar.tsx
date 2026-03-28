@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { Plus, Library } from "lucide-react"
-import { useLocation, useNavigate } from "react-router-dom"
+import { useLocation } from "react-router-dom"
 
 import { LeftBarButton } from "./LeftBarButton"
 import { CreateClassDialog } from "@/features/classes/components/CreateClassDialog"
@@ -9,15 +9,19 @@ import { useClassroomRoute } from "@/features/classes/hooks/useClassroomRoute"
 import { LeftBarClasses } from "@/features/classes/components/LeftBarClasses"
 import { useClassroomActions } from "@/features/classes/hooks/useClassroomAction"
 import { LeftBarClassesSkeleton } from "@/features/classes/components/LeftBarClassesSkeleton"
-import { LeftBarClassesError } from "@/features/classes/components/LeftBarClassesError"
+import { LeftBarClassesError } from "@/features/classes/components/emptyState/LeftBarClassesError"
 import { ConfirmDialog } from "@/shared/components/design/dialog"
 import { EditClassDialog } from "@/features/classes/components/EditClassDialog"
 import { UserProfileDropdown } from "@/features/auth/components/UserProfileDropdown"
 import { useAuthStore } from '@/app/store/autStore';
 import { useGuardedNavigate } from "@/shared/hooks/useGuardedNavigated"
+import { LeftBarClassesEmpty } from "@/features/classes/components/emptyState/LeftBarEmpty"
 
+interface LeftBarProps {
+  onOpenCreateClass: () => void;
+}
 
-export function LeftBar() {
+export function LeftBar({ onOpenCreateClass }: LeftBarProps) {
   const navigate = useGuardedNavigate();
   const location = useLocation();
   const isLibraryActive = location.pathname.startsWith("/challenge-library");
@@ -46,10 +50,6 @@ export function LeftBar() {
     setConfirmDeleteOpen(true)
   }
 
-  useEffect(() => {
-    console.log("user color: ", currentUser?.profile.color)
-  })
-
   return (
     <>
       <aside className="flex h-full w-16 flex-col border-r border-border bg-card items-center">
@@ -58,6 +58,8 @@ export function LeftBar() {
           <LeftBarClassesSkeleton />
         ) : isError ? (
           <LeftBarClassesError onRetry={refetch} />
+          ) : classes.length == 0 ?(
+          <LeftBarClassesEmpty />
         ) : (
           <LeftBarClasses
             classes={classes}
@@ -67,14 +69,12 @@ export function LeftBar() {
           />
         )}
 
-        <div className="flex-1" />
-
       
         <div className="flex flex-col gap-1 py-2 items-center justify-end w-full">
           <LeftBarButton
             icon={<Plus className="h-5 w-5" />}
             tooltip="Create class"
-            onClick={() => setOpenCreate(true)}
+            onClick={onOpenCreateClass}
           />
           <LeftBarButton
             icon={<Library className="h-5 w-5" />}
@@ -82,7 +82,7 @@ export function LeftBar() {
             onClick={() => navigate('challenge-library')}
             active={isLibraryActive}
           />
-          <UserProfileDropdown bgColor={currentUser?.profile.color || "var(--primary"}/>
+          <UserProfileDropdown bgColor={currentUser?.profile.color || "var(--primary)"}/>
         </div>
       </aside>
 

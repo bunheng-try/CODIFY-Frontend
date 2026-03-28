@@ -1,7 +1,6 @@
 import { CustomDialog } from "@/shared/components/design/dialog/CustomDialog";
-import type { Member, AddMemberDto } from "../../apis/member.api";
+import type { Member } from "../../apis/member.api";
 import type { SelectedStudent } from "../../hooks/useInviteStudent";
-import { useState } from "react";
 import { Badge } from "@/shared/components/ui/badge";
 
 interface InviteDialogProps {
@@ -9,10 +8,11 @@ interface InviteDialogProps {
   onOpenChange: (open: boolean) => void;
   email: string;
   onEmailChange: (email: string) => void;
-  searchResults: Member[];
+  searchResults: (Member & { alreadySelected?: boolean })[];
   selectedStudents: SelectedStudent[];
   selectStudent: (student: Member) => void;
   removeSelectedStudent: (userId: number) => void;
+  updateStudentRole: (userId: number, role: "STUDENT" | "TEACHER") => void;
   onInvite: () => Promise<{ success: boolean; error?: string }>;
 }
 
@@ -25,13 +25,12 @@ export default function InviteDialog({
   selectedStudents,
   selectStudent,
   removeSelectedStudent,
+  updateStudentRole,
   onInvite,
 }: InviteDialogProps) {
   const handleInvite = async () => {
     const result = await onInvite();
-    if (result.success) {
-      onOpenChange(false);
-    }
+    if (result.success) onOpenChange(false);
   };
 
   return (
@@ -55,15 +54,34 @@ export default function InviteDialog({
             <div className="flex flex-wrap gap-2 mt-2">
               {selectedStudents.map((s) => (
                 <Badge
-                  key={s.userId}
-                  className="flex items-center gap-2 cursor-pointer bg-[hsl(var(--surface-muted))] text-[hsl(var(--foreground))] px-3 py-1"
-                  onClick={() => removeSelectedStudent(s.userId)}
+                  key={`${s.userId}-${s.email}`} // ✅ unique key
+                  className="flex items-center gap-2 bg-[hsl(var(--surface-muted))] text-[hsl(var(--foreground))] px-3 py-1"
                 >
-                  <div className="flex flex-col leading-tight">
+                  <div className="flex flex-col leading-tight mr-2">
                     <span className="font-medium">{s.name}</span>
                     <span className="text-[0.7rem] text-[hsl(var(--muted-foreground))]">{s.email}</span>
                   </div>
-                  <span className="text-[hsl(var(--destructive))] font-bold">×</span>
+
+                  {/* Role selector */}
+                  <select
+                    value={s.role}
+                    onChange={(e) =>
+                      updateStudentRole(s.userId, e.target.value as "STUDENT" | "TEACHER")
+                    }
+                    className="border rounded px-1 py-0.5 text-xs bg-white"
+                  >
+                    <option value="STUDENT">Student</option>
+                    <option value="TEACHER">Teacher</option>
+                  </select>
+
+                  {/* Circular X button */}
+                  <button
+                    type="button"
+                    onClick={() => removeSelectedStudent(s.userId)}
+                    className="ml-2 w-5 h-5 flex items-center justify-center rounded-full border border-[hsl(var(--destructive))] text-[hsl(var(--destructive))] hover:bg-[hsl(var(--destructive)/10)]"
+                  >
+                    ×
+                  </button>
                 </Badge>
               ))}
             </div>
@@ -74,9 +92,10 @@ export default function InviteDialog({
             <div className="border rounded-md mt-1 bg-white shadow max-h-44 overflow-y-auto">
               {searchResults.map((s) => (
                 <div
-                  key={s.userId}
-                  className="p-2 hover:bg-[hsl(var(--surface-hover))] cursor-pointer flex flex-col"
-                  onClick={() => selectStudent(s)}
+                  key={`${s.userId}-${s.email}`} // ✅ unique key
+                  className={`p-2 flex flex-col cursor-pointer ${s.alreadySelected ? "opacity-50 cursor-not-allowed" : "hover:bg-[hsl(var(--surface-hover))]"
+                    }`}
+                  onClick={() => !s.alreadySelected && selectStudent(s)}
                 >
                   <span className="font-medium">{s.name}</span>
                   <span className="text-[0.75rem] text-[hsl(var(--muted-foreground))]">{s.email}</span>
@@ -87,11 +106,7 @@ export default function InviteDialog({
         </div>
       }
       actionButtons={[
-        {
-          label: "Cancel",
-          onClick: () => onOpenChange(false),
-          variant: "secondary",
-        },
+        { label: "Cancel", onClick: () => onOpenChange(false), variant: "secondary" },
         {
           label: "Invite",
           onClick: handleInvite,

@@ -27,6 +27,7 @@ export default function StudentDialogs({
   onContextMenuClose,
   classroomId,
 }: StudentDialogsProps) {
+
   const {
     email,
     searchByEmail,
@@ -35,6 +36,7 @@ export default function StudentDialogs({
     selectStudent,
     removeSelectedStudent,
     onInvite,
+    resetAll
   } = useInviteStudent(classroomId);
 
   return (

@@ -10,13 +10,18 @@ type Props = {
 
 export function LeftBarClasses({ classes, selectedClassroomId, onDelete, onEdit }: Props) {
     return (
-        <>
-            <div className="flex flex-col gap-0.5 py-2 overflow-hidden flex-1  w-full">
+        <div className="flex flex-col flex-1 overflow-hidden w-full">
+            <div className="flex-1 overflow-y-auto py-2 flex flex-col gap-0.5">
                 {classes.map((c) => (
-                    <ClassroomItem c={c} selectedClassroomId={selectedClassroomId!} onDelete={onDelete} onEdit={onEdit} />
+                    <ClassroomItem
+                        key={c.id}
+                        c={c}
+                        selectedClassroomId={selectedClassroomId!}
+                        onDelete={onDelete}
+                        onEdit={onEdit}
+                    />
                 ))}
             </div>
-
-        </>
-    )
+        </div>
+    );
 }

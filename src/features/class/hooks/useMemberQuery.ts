@@ -1,6 +1,6 @@
 // hooks/useMemberQuery.ts
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { memberApi, type Member, type MemberRoleDto, type AddMembersRequest } from "../apis/member.api";
+import { memberApi, type Member, type MemberRoleDto, type AddMembersRequest, type UserFromApi } from "../apis/member.api";
 
 // Query keys
 export const QUERY_KEYS = {
@@ -12,7 +12,7 @@ export const QUERY_KEYS = {
 
 // Get user by email
 export const useUserByEmail = (email: string | null) => {
-  return useQuery<Member[]>({
+  return useQuery<UserFromApi[]>({
     queryKey: email ? QUERY_KEYS.USER_BY_EMAIL(email) : ["userByEmail", "none"],
     enabled: !!email, // only fetch if email exists
     queryFn: () => {

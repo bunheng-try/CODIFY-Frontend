@@ -1,10 +1,15 @@
-import { Outlet, useNavigate, useOutlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { LeftBar } from "./leftBar/LeftBar";
 import { useUnsavedChangesStore } from "@/shared/store/UnsavedChangesStore";
 import { ConfirmDialog } from "@/shared/components/design/dialog";
+import { useState } from "react";
+import { CreateClassDialog } from "@/features/classes/components/CreateClassDialog";
+import { useClassroomActions } from "@/features/classes/hooks/useClassroomAction";
 
 export const AppShell = () => {
   const navigate = useNavigate();
+  const [openCreate, setOpenCreate] = useState(false);
+  const { createClassroom } = useClassroomActions();
 
   const {
     dialogOpen,
@@ -13,7 +18,7 @@ export const AppShell = () => {
     setPendingPath,
     setHasUnsavedChanges,
   } = useUnsavedChangesStore();
-  
+
   const handleStay = () => {
     setDialogOpen(false);
     setPendingPath(null);
@@ -32,13 +37,11 @@ export const AppShell = () => {
     }
   };
 
-
   return (
     <div className="flex h-screen w-screen overflow-hidden">
+      <LeftBar onOpenCreateClass={() => setOpenCreate(true)} />
 
-      <LeftBar />
-  
-      <Outlet />
+      <Outlet context={{ openCreateClass: () => setOpenCreate(true) }} />
 
       <ConfirmDialog
         open={dialogOpen}
@@ -54,7 +57,12 @@ export const AppShell = () => {
           You have unsaved changes. If you leave now, your edits will be lost.
         </p>
       </ConfirmDialog>
+
+      <CreateClassDialog
+        open={openCreate}
+        onClose={() => setOpenCreate(false)}
+        onCreate={createClassroom}
+      />
     </div>
   );
 };
-
