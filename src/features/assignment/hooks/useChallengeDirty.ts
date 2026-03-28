@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useChallenges } from "@/features/challenge/hooks/useChallengeQuery";
 import { useAssignmentAddChallenge } from "../hooks/useAssignmentQuery";
 import type { Challenge } from "@/features/challenge/apis/challenge.api";
 
@@ -15,7 +14,7 @@ export const useChallengesDirty = (assignmentId: number | null, classroomId: num
             setDraft(challenges.map(c => ({ ...c })));
             setInitialized(true);
         }
-    }, [challenges, initialized]);
+    }, [challenges, initialized, assignmentId]);
 
     const resetAll = () => {
         setDraft(challenges.map(c => ({ ...c })));

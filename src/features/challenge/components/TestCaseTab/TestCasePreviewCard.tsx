@@ -60,14 +60,16 @@ export default function TestCasePreviewCard({
                     </div>
 
                     <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-(--spacing-lg)">
-                        <div className="min-w-0">
+                        <div
+                            className="max-h-[300px] overflow-y-auto space-y-(--spacing-lg)"
+                            style={{ scrollBehavior: "smooth" }}
+                        >
                             <p className="typo-label mb-2 text-[hsl(var(--muted-foreground))]">
                                 Input
                             </p>
                             <div className="rounded-lg border bg-[hsl(var(--surface-muted))] px-3 py-2">
-                                <pre className="text-xs whitespace-pre-wrap break-words font-mono">
+                                <pre className="text-xs whitespace-pre-wrap break-words">
                                     {inputPreview.length > 0 ? inputPreview.join("\n") : "—"}
-                                    {testCase.input.split("\n").filter(Boolean).length > 2 ? "\n..." : ""}
                                 </pre>
                             </div>
                         </div>
@@ -77,9 +79,8 @@ export default function TestCasePreviewCard({
                                 Expected Output
                             </p>
                             <div className="rounded-lg border bg-[hsl(var(--surface-muted))] px-3 py-2">
-                                <pre className="text-xs whitespace-pre-wrap break-words font-mono">
+                                <pre className="text-xs whitespace-pre-wrap break-words">
                                     {outputPreview.length > 0 ? outputPreview.join("\n") : "—"}
-                                    {testCase.expectedOutput.split("\n").filter(Boolean).length > 2 ? "\n..." : ""}
                                 </pre>
                             </div>
                         </div>
