@@ -1,14 +1,17 @@
 import type { Member } from "../../apis/member.api";
 import StudentRow from "../students/Studentrow";
 import EmptyState from "./NoStudentState";
+import type { MemberRole } from "../MemberRoleSelect";
 
 interface StudentTableProps {
   students: Member[];
   isFiltered: boolean;
   onRemove: (student: Member) => void;
+  onRoleChange?: (student: Member, newRole: MemberRole) => void;
+  isChangingRole: boolean;
 }
 
-export default function StudentTable({ students, isFiltered, onRemove }: StudentTableProps) {
+export default function StudentTable({ students, isFiltered, onRemove, onRoleChange, isChangingRole }: StudentTableProps) {
   return (
     <div>
       <div className="border border-gray-100 rounded-xl overflow-hidden">
@@ -24,10 +27,12 @@ export default function StudentTable({ students, isFiltered, onRemove }: Student
         ) : (
           students.map((student, i) => (
             <StudentRow
-              key={student.id}
+              key={student.userId}
               student={student}
               isLast={i === students.length - 1}
               onRemove={onRemove}
+              onRoleChange={onRoleChange}
+              isChangingRole={isChangingRole}
             />
           ))
         )}

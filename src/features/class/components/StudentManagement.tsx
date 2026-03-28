@@ -1,31 +1,29 @@
 // pages/StudentManagement.tsx
 import { useState } from "react";
-import { useMembers, useRemoveMember } from "../hooks/useMemberQuery";
+import { useChangeMemberRole, useMembers, useRemoveMember } from "../hooks/useMemberQuery";
 import StudentToolbar from "./students/Studenttoolbar";
 import StudentTable from "./students/StudentTables";
 import StudentDialogs from "./dialogs/StudentDialogs";
-import type { Member } from "../apis/member.api";
 import { useClassroomRoute } from "@/features/classes/hooks/useClassroomRoute";
 import { Panel, PanelContent } from "@/shared/components/design/Panel";
 import { PanelHeader } from "@/shared/components/design/PanelHeader";
 import { Button } from "@/shared/components/ui/button";
 import { WrapIcon } from "@/shared/components/ui/wrapIcon";
 import { GraduationCap } from "lucide-react";
+import type { Member } from "../apis/member.api";
+import type { MemberRole } from "./MemberRoleSelect";
+import { ConfirmDialog } from "@/shared/components/design/dialog";
 
 export default function StudentManagement() {
   const { classroomId } = useClassroomRoute();
   const { data: members = [] } = useMembers(classroomId);
-
+  const changeRoleMutation = useChangeMemberRole(classroomId);
   const removeMember = useRemoveMember(classroomId);
 
   const [inviteOpen, setInviteOpen] = useState(false);
   const [confirmStudent, setConfirmStudent] = useState<any>(null);
+  const [confirmRoleChange, setConfirmRoleChange] = useState<{ student: Member; newRole: MemberRole } | null>(null);
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number; student: any } | null>(null);
-
-  const handleContextMenu = (student: Member, e: React.MouseEvent) => {
-    e.preventDefault();
-    setContextMenu({ x: e.clientX, y: e.clientY, student });
-  };
   
   const closeContextMenu = () => setContextMenu(null);
   const openConfirmRemove = (student: any) => setConfirmStudent(student);
@@ -34,6 +32,18 @@ export default function StudentManagement() {
     if (!confirmStudent) return;
     removeMember.mutate(confirmStudent.userId);
     setConfirmStudent(null);
+  };
+
+  const handleRoleConfirm = () => {
+    if (!confirmRoleChange) return;
+    const { student, newRole } = confirmRoleChange;
+
+    changeRoleMutation.mutate({
+      userId: student.userId,
+      dto: { role: newRole },
+    });
+
+    setConfirmRoleChange(null);
   };
 
   const exportStudents = () => {
@@ -81,6 +91,8 @@ export default function StudentManagement() {
               students={members}
               isFiltered={false}
               onRemove={(student) => setConfirmStudent(student)}
+              onRoleChange={(student, newRole) => setConfirmRoleChange({ student, newRole })}
+              isChangingRole={changeRoleMutation.isPending}
             />
         </PanelContent>
       </Panel>
@@ -95,7 +107,29 @@ export default function StudentManagement() {
         contextMenu={contextMenu}
         onContextMenuRemove={openConfirmRemove}
         onContextMenuClose={closeContextMenu}
+        existingMembers={members}
       />
+      <ConfirmDialog
+        open={!!confirmRoleChange}
+        onOpenChange={(open) => { if (!open) setConfirmRoleChange(null) }}
+        title={`Change role of ${confirmRoleChange?.student.name} to ${confirmRoleChange?.newRole}?`}
+        onConfirm={handleRoleConfirm}
+        confirmText="Change"
+        cancelText="Cancel"
+      >
+        This will change the member's role in the classroom.
+      </ConfirmDialog>
+
+      {/* <ConfirmDialog
+        open={!!confirmStudent}
+        onOpenChange={setConfirmStudent as any}
+        title={`Remove ${confirmStudent?.name}?`}
+        onConfirm={handleRemoveConfirm}
+        confirmText="Remove"
+        cancelText="Cancel"
+      >
+        Are you sure you want to remove this student from the class?
+      </ConfirmDialog> */}
     </>
   );
 }

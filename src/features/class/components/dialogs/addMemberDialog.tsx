@@ -1,16 +1,16 @@
 import { CustomDialog } from "@/shared/components/design/dialog/CustomDialog";
-import type { Member } from "../../apis/member.api";
-import type { SelectedStudent } from "../../hooks/useInviteStudent";
+import type { SelectedStudent, SearchStudentResult } from "../../hooks/useInviteStudent";
 import { Badge } from "@/shared/components/ui/badge";
+import MemberRoleSelect from "../MemberRoleSelect";
 
 interface InviteDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   email: string;
   onEmailChange: (email: string) => void;
-  searchResults: (Member & { alreadySelected?: boolean })[];
+  searchResults: SearchStudentResult[];
   selectedStudents: SelectedStudent[];
-  selectStudent: (student: Member) => void;
+  selectStudent: (student: SearchStudentResult) => void;
   removeSelectedStudent: (userId: number) => void;
   updateStudentRole: (userId: number, role: "STUDENT" | "TEACHER") => void;
   onInvite: () => Promise<{ success: boolean; error?: string }>;
@@ -54,27 +54,22 @@ export default function InviteDialog({
             <div className="flex flex-wrap gap-2 mt-2">
               {selectedStudents.map((s) => (
                 <Badge
-                  key={`${s.userId}-${s.email}`} // ✅ unique key
+                  key={s.userId}
                   className="flex items-center gap-2 bg-[hsl(var(--surface-muted))] text-[hsl(var(--foreground))] px-3 py-1"
                 >
                   <div className="flex flex-col leading-tight mr-2">
                     <span className="font-medium">{s.name}</span>
-                    <span className="text-[0.7rem] text-[hsl(var(--muted-foreground))]">{s.email}</span>
+                    <span className="text-[0.7rem] text-[hsl(var(--muted-foreground))]">
+                      {s.email}
+                    </span>
                   </div>
 
-                  {/* Role selector */}
-                  <select
+                  <MemberRoleSelect
                     value={s.role}
-                    onChange={(e) =>
-                      updateStudentRole(s.userId, e.target.value as "STUDENT" | "TEACHER")
-                    }
-                    className="border rounded px-1 py-0.5 text-xs bg-white"
-                  >
-                    <option value="STUDENT">Student</option>
-                    <option value="TEACHER">Teacher</option>
-                  </select>
+                    onChange={(role) => updateStudentRole(s.userId, role)}
+                    compact
+                  />
 
-                  {/* Circular X button */}
                   <button
                     type="button"
                     onClick={() => removeSelectedStudent(s.userId)}
@@ -87,18 +82,21 @@ export default function InviteDialog({
             </div>
           )}
 
-          {/* Search results */}
           {searchResults.length > 0 && (
             <div className="border rounded-md mt-1 bg-white shadow max-h-44 overflow-y-auto">
               {searchResults.map((s) => (
                 <div
-                  key={`${s.userId}-${s.email}`} // ✅ unique key
-                  className={`p-2 flex flex-col cursor-pointer ${s.alreadySelected ? "opacity-50 cursor-not-allowed" : "hover:bg-[hsl(var(--surface-hover))]"
+                  key={s.id}
+                  className={`p-2 flex flex-col cursor-pointer ${s.alreadySelected
+                      ? "opacity-50 cursor-not-allowed"
+                      : "hover:bg-[hsl(var(--surface-hover))]"
                     }`}
                   onClick={() => !s.alreadySelected && selectStudent(s)}
                 >
                   <span className="font-medium">{s.name}</span>
-                  <span className="text-[0.75rem] text-[hsl(var(--muted-foreground))]">{s.email}</span>
+                  <span className="text-[0.75rem] text-[hsl(var(--muted-foreground))]">
+                    {s.email}
+                  </span>
                 </div>
               ))}
             </div>

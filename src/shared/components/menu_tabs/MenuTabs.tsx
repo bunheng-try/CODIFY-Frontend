@@ -30,9 +30,15 @@ const MenuTabs = <T extends string>({
     const index = tabs.findIndex((t) => t.key === activeTab);
     const button = container.children[index] as HTMLElement;
     if (button) {
-      setUnderlineStyle({ left: button.offsetLeft, width: button.offsetWidth });
+      const newStyle = { left: button.offsetLeft, width: button.offsetWidth };
+      if (
+        newStyle.left !== underlineStyle.left ||
+        newStyle.width !== underlineStyle.width
+      ) {
+        setUnderlineStyle(newStyle);
+      }
     }
-  }, [activeTab, tabs]);
+  }, [activeTab, tabs, underlineStyle]);
 
   return (
     <div

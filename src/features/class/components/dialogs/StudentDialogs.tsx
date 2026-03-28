@@ -14,6 +14,7 @@ interface StudentDialogsProps {
   onContextMenuRemove: (student: Member) => void;
   onContextMenuClose: () => void;
   classroomId: number | null;
+  existingMembers: Member[];
 }
 
 export default function StudentDialogs({
@@ -26,8 +27,8 @@ export default function StudentDialogs({
   onContextMenuRemove,
   onContextMenuClose,
   classroomId,
+  existingMembers,
 }: StudentDialogsProps) {
-
   const {
     email,
     searchByEmail,
@@ -35,9 +36,9 @@ export default function StudentDialogs({
     selectedStudents,
     selectStudent,
     removeSelectedStudent,
+    updateStudentRole,
     onInvite,
-    resetAll
-  } = useInviteStudent(classroomId);
+  } = useInviteStudent(classroomId, existingMembers);
 
   return (
     <>
@@ -59,6 +60,7 @@ export default function StudentDialogs({
         selectedStudents={selectedStudents}
         selectStudent={selectStudent}
         removeSelectedStudent={removeSelectedStudent}
+        updateStudentRole={updateStudentRole}
         onInvite={onInvite}
       />
 
