@@ -13,10 +13,13 @@ import { useGradingStore } from "../stores/gradingScore";
 import GradingPanel from "../components/GradingPanel";
 import TeacherSubmissionTopBar from "../components/TeacherSubmissionTopBar";
 import { ChallengeItem } from "@/features/chllenge_workspce/components/ChallengeItem";
-import { Input } from "@/shared/components/ui/input";
+import { Panel } from "react-resizable-panels";
+import { PanelContent } from "@/shared/components/design/Panel";
+import { Textarea } from "@/shared/components/ui/textarea";
 
 function TeacherSubmissionViewPage() {
   const { classroomId, assignmentId, submissionId } = useParams();
+  const HOME_PAGE_ID = -1;
 
   const reset = useGradingStore((s) => s.reset);
   useEffect(() => {
@@ -57,7 +60,7 @@ function TeacherSubmissionViewPage() {
     if (!assignmentQuery.isSuccess || !assignment || challenges.length === 0) return;
     const validIds = challenges.map((c) => c.id);
     if (currentChallengeId == null || !validIds.includes(currentChallengeId)) {
-      setCurrentChallenge(challenges[0].id);
+      setCurrentChallenge(HOME_PAGE_ID);
     }
   }, [assignmentQuery.isSuccess, assignment, challenges, currentChallengeId, setCurrentChallenge]);
 
@@ -76,7 +79,7 @@ function TeacherSubmissionViewPage() {
     return <WorkspaceSkeleton />;
   }
 
-  if (!currentChallenge) {
+  if (currentChallengeId !== HOME_PAGE_ID && !currentChallenge) {
     return (
       <div className="flex h-screen w-screen items-center justify-center typo-body text-[hsl(var(--muted-foreground))]">
         No challenge found for this assignment.
@@ -95,36 +98,70 @@ function TeacherSubmissionViewPage() {
       />
 
       <div className="flex flex-1 min-h-0">
-        <ChallengeSidebar challenges={challenges} />
+        <ChallengeSidebar challenges={challenges} >
+          <ChallengeItem
+            name={"H"}
+            active={currentChallengeId === Number(HOME_PAGE_ID)}
+            onClick={() => setCurrentChallenge(Number(HOME_PAGE_ID))}
+          />
+        </ChallengeSidebar>
 
-        <ResizablePanelContainer direction="horizontal" className="flex-1 min-h-0">
-          <ResizablePanel className="min-h-0">
-            <InstructionPanel challenge={currentChallenge} />
-          </ResizablePanel>
+        {
+          currentChallengeId === Number(-1)
+            ?
+            <ResizablePanelContainer direction="horizontal" className="flex-1 min-h-0">
+              <ResizablePanel className="min-h-0">
+                <Panel>
+                  <PanelContent>
+                    <p className='typo-body'>
+                      {assignment?.description || "Undefined"}
+                    </p>
+                  </PanelContent>
+                </ Panel>
+              </ResizablePanel>
+              <ResizablePanel className="min-h-0">
+                <GradingPanel
+                  classroomId={Number(classroomId)}
+                  assignmentId={Number(assignmentId)}
+                  submissionId={Number(submissionId)}
+                  studentName={studentName}
+                  submittedAt={submittedAt}
+                  currentScore={submissionData?.totalScore}
+                />
+              </ResizablePanel>
+            </ResizablePanelContainer>
+            :
+            <ResizablePanelContainer direction="horizontal" className="flex-1 min-h-0">
+              <ResizablePanel className="min-h-0">
+                <InstructionPanel challenge={currentChallenge!} />
+              </ResizablePanel>
 
-          <ResizablePanelDivider />
+              <ResizablePanelDivider />
 
-          <ResizablePanel className="flex flex-col min-h-0">
-            <IDEPanel
-              challengeId={currentChallenge.id}
-              language={currentChallenge.language}
-              readOnly
-            />
-          </ResizablePanel>
+              <ResizablePanel className="flex flex-col min-h-0">
+                <IDEPanel
+                  challengeId={currentChallenge!.id}
+                  language={currentChallenge!.language}
+                  readOnly
+                />
+              </ResizablePanel>
 
-          <ResizablePanelDivider />
+              <ResizablePanelDivider />
 
-          <ResizablePanel className="min-h-0">
-            <GradingPanel
-              classroomId={Number(classroomId)}
-              assignmentId={Number(assignmentId)}
-              submissionId={Number(submissionId)}
-              studentName={studentName}
-              submittedAt={submittedAt}
-              currentScore={submissionData?.totalScore}
-            />
-          </ResizablePanel>
-      </ResizablePanelContainer>
+              <ResizablePanel className="min-h-0">
+                <div className="flex flex-col gap-1 flex-1 p-4">
+                  <label className="typo-label font-medium text-[hsl(var(--foreground))]">
+                    Feedback
+                  </label>
+                  <Textarea
+                    placeholder="Write your feedback for the student..."
+                    onChange={()=>{}}
+                    className="resize-none flex-1 min-h-[180px]"
+                  />
+                </div>
+              </ResizablePanel>
+            </ResizablePanelContainer>
+        }
       
       </div>
     </div>
