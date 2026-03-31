@@ -19,7 +19,7 @@ export const useTestCasesDirty = (challengeId: number) => {
     useEffect(() => {
         setDraft(testCases.map(tc => ({ ...tc })));
         setDeletedIds([]);
-    }, [challengeId]);
+    }, [challengeId, testCases]);
 
     const updateField = (id: number, key: keyof TestCase, value: any) => {
         setDraft(prev =>

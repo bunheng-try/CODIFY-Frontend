@@ -26,7 +26,6 @@ type Props = {
 const AssignmentHeader = ({ classroomId, isDirty, assignment, updateField, save, cancel, onDeleteRequest }: Props) => {
   const { activeTab, setActiveTab } = useAssignmentTabs();
   const { mutate: publishAssignment, isPending: isPublishing } = usePublishAssignment();
-  const [showPublishedUI, setShowPublishedUI] = useState(assignment.isPublished);
 
   const titleInputRef = useRef<HTMLInputElement>(null);
   const location = useLocation();
@@ -41,6 +40,8 @@ const AssignmentHeader = ({ classroomId, isDirty, assignment, updateField, save,
   
   const [openErrorDialog, setOpenErrorDialog] = useState(false);
 
+  const showPublishUI = assignment.isPublished
+
   const handlePublish = () => {
     if (!assignment.codingChallenges || assignment.codingChallenges.length === 0) {
       setOpenErrorDialog(true);
@@ -48,7 +49,7 @@ const AssignmentHeader = ({ classroomId, isDirty, assignment, updateField, save,
     }
 
     publishAssignment({ classroomId, assignmentId: assignment.id });
-    setShowPublishedUI(assignment.isPublished);
+    console.log("ispublishe: ", assignment.isPublished);
   };
 
   type TabKey = "challenge" | "settings" | "submission";
@@ -79,7 +80,7 @@ const AssignmentHeader = ({ classroomId, isDirty, assignment, updateField, save,
                   Save
                 </Button>
               </>
-            ) : showPublishedUI ? (
+            ) : !showPublishUI ? (
               <>
                   <Button variant="secondary" onClick={onDeleteRequest}>Delete</Button>
                 <Button variant="default" onClick={handlePublish}>{isPublishing ? "Publishing..." : "Publish"}</Button>

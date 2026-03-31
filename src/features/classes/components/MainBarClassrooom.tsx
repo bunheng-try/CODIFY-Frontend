@@ -25,9 +25,6 @@ import { ContextMenu } from "@/shared/components/context-menu/ContextMenu";
 import { useAssignmentContextMenu } from "@/features/assignment/hooks/useAssignmentContextMenu";
 import ListSkeleton from "@/shared/components/loading-skeleton/ListSkeleton";
 import type { Classroom } from "../apis/classroom.api";
-import { useQueryClient } from "@tanstack/react-query";
-import { useAuthStore } from "@/app/store/autStore";
-import type { Submission } from "@/features/assignment/apis/submission.api";
 import { useClassroomRole } from "../hooks/useClassroomRole";
 
 type DialogKey = "edit" | "create" | "delete" | "leave";
@@ -36,15 +33,9 @@ interface MainBarClassroomProp {
   classroom: Classroom;
 }
 
-const COMPLETED_STATUSES = ["SUBMITTED", "GRADING", "GRADED", "EVALUATED"];
-
-const MainBarClassroom = ({ classroom }: MainBarClassroomProp) => {
+const MainBarClassroom = ({ classroom }:MainBarClassroomProp) => {
   const navigate = useGuardedNavigate();
   const { classroomId, assignmentId } = useClassroomRoute();
-  const queryClient = useQueryClient();
-  const currentUser = useAuthStore((s) => s.user);
-  const { data: roleData } = useClassroomRole(classroomId);
-  
 
   // Queries
   const { data: assignments = [], isLoading } = useAssignmentClassrooms(classroomId);
@@ -55,6 +46,7 @@ const MainBarClassroom = ({ classroom }: MainBarClassroomProp) => {
   const { mutate: leaveClassroom } = useLeaveClassroom();
   const { mutate: deleteAssignment } = useDeleteAssignment();
   const { mutate: publishAssignment } = usePublishAssignment();
+  const {data: roleData} = useClassroomRole(classroomId);
 
   // Local state
   const [selectedClass, setSelectedClass] = useState<{ id: number; name: string } | null>(null);
@@ -73,41 +65,23 @@ const MainBarClassroom = ({ classroom }: MainBarClassroomProp) => {
 
   const tabs = isStudent
     ? [
-        { key: "Upcoming", label: "Upcoming" },
-        { key: "Past Due", label: "Past Due" },
-        { key: "Completed", label: "Completed" },
-      ]
+      { key: "Upcoming", label: "Upcoming" },
+      { key: "Past Due", label: "Past Due" },
+      { key: "Completed", label: "Completed" },
+    ]
     : [
-        { key: "All", label: "All" },
-        { key: "Active", label: "Active" },
-        { key: "Draft", label: "Draft" },
-      ];
-
-  // Check student has submmit or nah 
-  const isCompletedByStudent = (assignmentId: number): boolean => {
-    if (!currentUser) return false;
-    const cached = queryClient.getQueryData<Submission[]>([
-      "submissions",
-      classroomId,
-      assignmentId,
-    ]);
-    if (!cached) return false;
-    return cached.some(
-      (s) =>
-        String(s.userId) === String(currentUser.id) &&
-        COMPLETED_STATUSES.includes(s.status)
-    );
-  };
+      { key: "All", label: "All" },
+      { key: "Active", label: "Active" },
+      { key: "Draft", label: "Draft" },
+    ];
 
   const filteredAssignments = useMemo(() => {
-
     return assignments.filter((a) => {
-      console.log("assignmentId ", a.id ,"assignmenttitle", a.title ,"submmission status: ", a.submissionStatus)
       if (isStudent) {
-        const isPast = new Date(a.dueAt) < new Date() && a.submissionStatus !== "NOT SUBMITTED";
+        const isPast = new Date(a.dueAt) < new Date();
         if (activeTab === "Upcoming") return !isPast;
         if (activeTab === "Past Due") return isPast;
-        if (activeTab === "Completed") return a.submissionStatus !== "NOT SUBMITTED";
+        if (activeTab === "Completed") return false; // TODO
         return true;
       }
 
@@ -115,7 +89,7 @@ const MainBarClassroom = ({ classroom }: MainBarClassroomProp) => {
       if (activeTab === "Draft") return !a.isPublished;
       return true;
     });
-  }, [assignments, activeTab, isStudent, currentUser]);
+  }, [assignments, activeTab, isStudent]);
 
   const openDialog = (key: DialogKey) =>
     setDialogs((prev) => ({ ...prev, [key]: true }));
@@ -140,33 +114,13 @@ const MainBarClassroom = ({ classroom }: MainBarClassroomProp) => {
     setActiveTab(isStudent ? "Upcoming" : "All");
   }, [classroomId, isStudent]);
 
+
   useEffect(() => {
     if (classroom === undefined) return;
     if (!classroom) navigate("/");
   }, [classroom, navigate]);
 
   if (!classroom) return null;
-
-  // Empty state for student
-  const renderEmptyState = () => {
-    if (isStudent) {
-      return (
-        <div className="flex flex-col items-center justify-center py-16 gap-2 text-center">
-          <p className="text-sm font-medium text-[hsl(var(--foreground))]">
-            No assignments yet
-          </p>
-          <p className="text-sm text-[hsl(var(--muted-foreground))]">
-            {activeTab === "Completed"
-              ? "You haven't completed any assignments yet."
-              : activeTab === "Past Due"
-              ? "No past due assignments."
-              : "No upcoming assignments."}
-          </p>
-        </div>
-      );
-    }
-    return <AssignementEmptyState onCreate={() => openDialog("create")} />;
-  };
 
   return (
     <>
@@ -213,9 +167,7 @@ const MainBarClassroom = ({ classroom }: MainBarClassroomProp) => {
               >
                 <GraduationCap className="w-4 h-4" />
                 <span>
-                  {isMembersLoading
-                    ? "Loading..."
-                    : `${members.length} Member${members.length > 1 ? "s" : ""}`}
+                  {isMembersLoading ? "Loading..." : `${members.length} Member${members.length > 1 ? "s" : ""}`}
                 </span>
               </div>
             )
@@ -232,14 +184,13 @@ const MainBarClassroom = ({ classroom }: MainBarClassroomProp) => {
         <PanelContent className="flex flex-col gap-2 p-4">
           {isLoading ? (
             <ListSkeleton />
-          ) : filteredAssignments.length === 0 ? (
-            renderEmptyState()
+          ): filteredAssignments.length === 0 ? (
+            <AssignementEmptyState onCreate={() => openDialog("create")} />
           ) : (
             filteredAssignments.map((a) => (
               <AssignmentCard
                 key={a.id}
                 assignment={a}
-                isStudent={isStudent}
                 isSelect={a.id === assignmentId}
                 onClick={() =>
                   navigate(`/classrooms/${classroomId}/assignments/${a.id}`)
@@ -274,10 +225,12 @@ const MainBarClassroom = ({ classroom }: MainBarClassroomProp) => {
         cancelText="Cancel"
         onConfirm={() => {
           if (!assignmentToDelete) return;
+
           deleteAssignment({
             classroomId,
             assignmentId: assignmentToDelete.id,
           });
+
           setAssignmentToDelete(null);
         }}
       >
