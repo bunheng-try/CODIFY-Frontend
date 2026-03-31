@@ -4,7 +4,7 @@ export type Challenge = {
   id: number;
   title: string;
   description: string;
-  starterCode: string;
+  startCode: string;
   language: Languages;
   difficulty: ChallengeLevel;
   tagId?: number;
