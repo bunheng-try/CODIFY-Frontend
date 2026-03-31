@@ -5,9 +5,10 @@ import type { Challenge } from "@/features/challenge/apis/challenge.api";
 
 interface ChallengeSidebarProps {
   challenges: Challenge[];
+  children?: React.ReactNode
 }
 
-const ChallengeSidebar: React.FC<ChallengeSidebarProps> = ({ challenges }) => {
+const ChallengeSidebar: React.FC<ChallengeSidebarProps> = ({ challenges,children }) => {
   const { currentChallengeId, setCurrentChallenge } = useWorkspaceStore();
 
   return (
@@ -24,6 +25,7 @@ const ChallengeSidebar: React.FC<ChallengeSidebarProps> = ({ challenges }) => {
         scrollbar-thin scrollbar-thumb-[hsl(var(--border))] scrollbar-track-[hsl(var(--workspace))]
       "
     >
+      {children}
       {challenges.map((c, index) => (
         <ChallengeItem
           key={c.id}

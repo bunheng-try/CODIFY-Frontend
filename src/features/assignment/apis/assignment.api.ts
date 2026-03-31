@@ -17,7 +17,7 @@ export interface Assignment {
     sectionId: number;
     createdAt: string;
     updatedAt: string;
-    assignmentChallenges: AssignmentChallenge[]
+    codingChallenges: AssignmentChallenge[]
 }
 
 export interface AssignmentChallenge extends Challenge {

@@ -24,7 +24,7 @@ function StudentSubmissionViewPage() {
 
   const assignmentQuery = useAssignment(Number(classroomId), Number(assignmentId));
   const assignment = assignmentQuery.data;
-  const challenges = assignment?.assignmentChallenges ?? [];
+  const challenges = assignment?.codingChallenges ?? [];
   const { data: submissionData, isLoading: isSubmissionLoading } = useSubmission(
     Number(classroomId),
     Number(assignmentId),

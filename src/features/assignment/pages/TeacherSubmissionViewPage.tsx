@@ -12,6 +12,8 @@ import { useWorkspaceStore } from "@/features/chllenge_workspce/stores/useWorksp
 import { useGradingStore } from "../stores/gradingScore";
 import GradingPanel from "../components/GradingPanel";
 import TeacherSubmissionTopBar from "../components/TeacherSubmissionTopBar";
+import { ChallengeItem } from "@/features/chllenge_workspce/components/ChallengeItem";
+import { Input } from "@/shared/components/ui/input";
 
 function TeacherSubmissionViewPage() {
   const { classroomId, assignmentId, submissionId } = useParams();
@@ -24,7 +26,7 @@ function TeacherSubmissionViewPage() {
   // Data fetching
   const assignmentQuery = useAssignment(Number(classroomId), Number(assignmentId));
   const assignment = assignmentQuery.data;
-  const challenges = assignment?.assignmentChallenges ?? [];
+  const challenges = assignment?.codingChallenges ?? [];
 
   const { data: submissionData, isLoading: isSubmissionLoading } = useSubmission(
     Number(classroomId),
@@ -122,7 +124,8 @@ function TeacherSubmissionViewPage() {
               currentScore={submissionData?.totalScore}
             />
           </ResizablePanel>
-        </ResizablePanelContainer>
+      </ResizablePanelContainer>
+      
       </div>
     </div>
   );

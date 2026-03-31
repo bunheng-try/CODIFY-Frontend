@@ -57,7 +57,7 @@ export const SubmissionCard = ({ submission }: SubmissionCardProps) => {
 
 
   return (
-    <Card >
+    <Card onClick={handleClick} className="cursor-pointer">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-[var(--spacing-md)]">
           <div className="w-10 h-10 rounded-full bg-[hsl(var(--surface-muted))] flex items-center justify-center font-medium">

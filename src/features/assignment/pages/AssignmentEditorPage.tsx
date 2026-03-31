@@ -53,7 +53,7 @@ const AssignmentEditor = () => {
     hasUnsaved: hasUnsavedChallenge,
     save: saveChallenge,
     cancel: cancelChallenge,
-  } = useChallengesDirty(assignmentId, classroomId, draft?.assignmentChallenges || []);
+  } = useChallengesDirty(assignmentId, classroomId, draft?.codingChallenges || []);
 
   const { data: submissions = [], isLoading: isSubmissionsLoading, isError: isSubmissionsError } =
     useSubmissions(classroomId, assignmentId);
@@ -120,6 +120,8 @@ const AssignmentEditor = () => {
 
     setHasUnsavedChanges(false);
   };
+
+  console.log('Draft', draft)
 
   return (
     <>
