@@ -168,13 +168,8 @@ const StudentAssignmentPage = () => {
               <span className="text-[hsl(var(--muted-foreground))]">Due Date</span>
               <span>{formattedDue}</span>
             </div>
-            <div className="flex justify-between py-2 text-sm">
-              <span className="text-[hsl(var(--muted-foreground))]">Total Points</span>
-              <span className="text-muted-foreground">Total Points</span>
-              <span>{assignment.codingChallenges.length * 25}</span>
-            </div>
             {mySubmission && (
-              <div className="flex justify-between py-2 border-t border-[hsl(var(--border))] text-sm mt-1">
+              <div className="flex justify-between py-2 border-[hsl(var(--border))] text-sm mt-1">
                 <span className="text-[hsl(var(--muted-foreground))]">My Status</span>
                 <span className="font-medium text-[hsl(var(--foreground))]">
                   {isGraded

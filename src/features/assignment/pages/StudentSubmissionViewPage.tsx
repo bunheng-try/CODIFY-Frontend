@@ -19,6 +19,7 @@ import { Badge } from "@/shared/components/ui/badge";
 import StudentResultPanel from "../components/StudentResultPanel";
 
 function StudentSubmissionViewPage() {
+  const HOME_PAGE_ID = -1;
   const { classroomId, assignmentId, submissionId } = useParams();
   const navigate = useNavigate();
 

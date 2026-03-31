@@ -30,6 +30,12 @@ export const SubmissionCard = ({ submission }: SubmissionCardProps) => {
     switch (status) {
       case "SUBMITTED":
         return {
+          label: "Submitted",
+          variant: "status-published",
+          icon: Check,
+        };
+      case "GRADED":
+        return {
           label: "Graded",
           variant: "status-published",
           icon: Check,
@@ -78,7 +84,7 @@ export const SubmissionCard = ({ submission }: SubmissionCardProps) => {
             {config.label}
           </Badge>
 
-          {status === "SUBMITTED" && totalScore != null && (
+          {status === "GRADED" && totalScore != null && (
             <span className="typo-body-sm text-[hsl(var(--primary))] font-medium">
               {totalScore}%
             </span>

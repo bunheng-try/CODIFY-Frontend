@@ -42,6 +42,11 @@ export interface SubmissionWithStudentName extends Submission {
     name: string;
 }
 
+export interface FeedbackDto {
+    text: String,
+    score?: number,
+}
+
 import { httpClient } from "@/app/services/httpClient";
 
 export const submissionsApi = {
@@ -84,6 +89,26 @@ export const submissionsApi = {
         httpClient.post<Submission, void>(
             `/classrooms/${classroomId}/assignments/${assignmentId}/submissions/${submissionId}/turn-in`,
             undefined
+        ),
+    applyFeedback: (
+        classroomId: number,
+        assignmentId: number,
+        submissionId: number,
+        dto: FeedbackDto
+    ) =>
+        httpClient.post<void, FeedbackDto>(
+            `/classrooms/${classroomId}/assignments/${assignmentId}/submissions/${submissionId}/feedback`,
+            dto
+        ),
+
+    // GET feedback
+    getFeedback: (
+        classroomId: number,
+        assignmentId: number,
+        submissionId: number
+    ) =>
+        httpClient.get<FeedbackDto>(
+            `/classrooms/${classroomId}/assignments/${assignmentId}/submissions/${submissionId}/feedback`
         ),
 
     // TODO: uncomment this and delete the mock block below once backend implements /grade
