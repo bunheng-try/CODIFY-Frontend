@@ -6,6 +6,8 @@ import type { Challenge } from "@/features/challenge/apis/challenge.api";
    Types (based on Swagger)
    ========================= */
 
+export type SubmissionStatus = "SUBMITTED" | "LATED" | "NOT SUBMITTED"
+
 export interface Assignment {
     points: number;
     id: number;
@@ -13,11 +15,12 @@ export interface Assignment {
     description: string;
     dueAt: string;
     isPublished: boolean;
+    submissionStatus: SubmissionStatus;
     classroomId :number;
     sectionId: number;
     createdAt: string;
     updatedAt: string;
-    assignmentChallenges: AssignmentChallenge[]
+    codingChallenges: AssignmentChallenge[]
 }
 
 export interface AssignmentChallenge extends Challenge {
@@ -84,6 +87,10 @@ export const assignmentsApi = {
         httpClient.post<void, { challengeIds: number[] }>(
             `/classrooms/${classroomId}/assignments/${assignmentId}/challenges`,
             { challengeIds }
+        ),
+    removeChallenge: (classroomId: number, assignmentId: number, challengeId: number) =>
+        httpClient.delete<void>(
+            `/classrooms/${classroomId}/assignments/${assignmentId}/challenges/${challengeId}`
         ),
 };
 

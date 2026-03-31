@@ -16,11 +16,10 @@ export const useTestCasesDirty = (challengeId: number) => {
     const [draft, setDraft] = useState<TestCase[]>([]);
     const [deletedIds, setDeletedIds] = useState<number[]>([]);
 
-    // Reset local draft whenever fetched test cases change
     useEffect(() => {
         setDraft(testCases.map(tc => ({ ...tc })));
         setDeletedIds([]);
-    }, [challengeId, testCases]);
+    }, [challengeId]);
 
     const updateField = (id: number, key: keyof TestCase, value: any) => {
         setDraft(prev =>

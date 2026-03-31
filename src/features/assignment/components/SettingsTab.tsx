@@ -44,7 +44,7 @@ export const SettingsTab = ({ draft, updateField }: SettingsTabProps) => {
               onChange={handleDueDateChange}
               icon={<CalendarIcon className="w-5 h-5 text-gray-400" />}
               placeholder="Select due date"
-              type="date" // <--- specify type
+              type="date"
             />
           </LabeledSection>
 
@@ -59,9 +59,9 @@ export const SettingsTab = ({ draft, updateField }: SettingsTabProps) => {
             />
           </LabeledSection>
 
-          <LabeledSection label="Points">
+          {/* <LabeledSection label="Points">
             Timer option with toggle button
-          </LabeledSection>
+          </LabeledSection> */}
 
           <LabeledSection label="Status">
             <span className="capitalize">{draft.isPublished ? "Published" : "Not Published"}</span>
@@ -70,7 +70,6 @@ export const SettingsTab = ({ draft, updateField }: SettingsTabProps) => {
         </div>
       </SectionContainer>
 
-      {/* Description */}
       <SectionContainer title="Description">
         <EditableField
           value={draft.description}

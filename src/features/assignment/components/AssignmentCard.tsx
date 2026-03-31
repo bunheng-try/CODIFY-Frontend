@@ -14,6 +14,7 @@ interface Props {
     totalStudent: number;
     showActions?: boolean;
     totalSubmitted?: number;
+    isStudent?: boolean;
     classroomId: number
     onContextMenu?: (e: React.MouseEvent, assignment: Assignment) => void;
 }
@@ -24,6 +25,7 @@ export const AssignmentCard = ({
     onContextMenu,
     isSelect = false,
     totalStudent,
+    isStudent,
     showActions = false,
     // totalSubmitted
     classroomId
@@ -37,15 +39,38 @@ export const AssignmentCard = ({
         totalSubmitted
     });
 
+    let badgeText: string;
+    let badgeVariant: "status-published" | "status-draft" | "status-submitted" | "status-lated";
+
+    if (isStudent) {
+        // Student view
+        switch (assignment.submissionStatus) {
+            case "SUBMITTED":
+                badgeText = "SUBMITTED";
+                badgeVariant = "status-submitted";
+                break;
+            case "LATED":
+                badgeText = "LATED";
+                badgeVariant = "status-lated";
+                break;
+            case "NOT SUBMITTED":
+            default:
+                badgeText = "NOT SUBMITTED";
+                badgeVariant = "status-draft";
+                break;
+        }
+    } else {
+        badgeText = assignment.isPublished ? "Published" : "Draft";
+        badgeVariant = assignment.isPublished ? "status-published" : "status-draft";
+    }
+
     return (
         <Card isSelected={isSelect} onClick={() => onClick(assignment)} onContextMenu={(e) => onContextMenu?.(e, assignment)}>
             <CardContent>
                 <CardHeader
                     title={assignment.title}
                     badge={
-                        <Badge variant={status === "Published" ? "status-published" : "status-draft"}>
-                            {status.toLocaleUpperCase()}
-                        </Badge>
+                        <Badge variant={badgeVariant}>{badgeText}</Badge>
                     }
                     actions={
                         showActions ? (

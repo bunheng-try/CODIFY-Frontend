@@ -83,7 +83,7 @@ const StudentAssignmentPage = () => {
     ? new Date(assignment.dueAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })
     : "—";
 
-  const hasNoChallenges = assignment.assignmentChallenges.length === 0;
+  const hasNoChallenges = assignment.codingChallenges.length === 0;
 
   return (
     <Panel>
@@ -122,7 +122,7 @@ const StudentAssignmentPage = () => {
             </div>
             <div className="flex justify-between py-2 text-sm">
               <span className="text-muted-foreground">Total Points</span>
-              <span>{assignment.assignmentChallenges.length * 25}</span>
+              <span>{assignment.codingChallenges.length * 25}</span>
             </div>
           </div>
         </div>
@@ -135,7 +135,7 @@ const StudentAssignmentPage = () => {
             </div>
           ) : (
             <div className="flex flex-col gap-2">
-              {assignment.assignmentChallenges.map((challenge, index) => (
+              {assignment.codingChallenges.map((challenge, index) => (
                 <ChallengeCard key={challenge.id} challenge={challenge} variant="assignment" index={index + 1} />
               ))}
             </div>

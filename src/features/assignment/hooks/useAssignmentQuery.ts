@@ -222,3 +222,31 @@ export const useAssignmentAddChallenge = () => {
     },
   });
 };
+
+export const useAssignmentRemoveChallenge = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      classroomId,
+      assignmentId,
+      challengeId,
+    }: {
+      classroomId: number;
+      assignmentId: number;
+      challengeId: number;
+    }) => assignmentsApi.removeChallenge(classroomId, assignmentId, challengeId),
+
+    onSuccess: (_, variables) => {
+      const { classroomId, assignmentId } = variables;
+
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.ASSIGNMENT(classroomId, assignmentId),
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.ASSIGNMENTS(classroomId),
+      });
+    },
+  });
+};

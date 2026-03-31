@@ -1,44 +1,59 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAssignmentAddChallenge } from "../hooks/useAssignmentQuery";
 import type { Challenge } from "@/features/challenge/apis/challenge.api";
 
-export const useChallengesDirty = (assignmentId: number | null, classroomId: number | null, challenges: Challenge[]) => {
+export const useChallengesDirty = (
+    assignmentId: number | null,
+    classroomId: number | null,
+    challenges: Challenge[]
+) => {
     const addMutation = useAssignmentAddChallenge();
 
     const [draft, setDraft] = useState<Challenge[]>([]);
-    const [initialized, setInitialized] = useState(false);
-    const [added, setAdded] = useState<Challenge[]>([]);
 
     useEffect(() => {
-        if (!initialized && challenges.length > 0) {
-            setDraft(challenges.map(c => ({ ...c })));
-            setInitialized(true);
+        if (!assignmentId || !classroomId) {
+            setDraft([]);
+            return;
         }
-    }, [challenges, initialized, assignmentId]);
+
+        setDraft(challenges.map((c) => ({ ...c })));
+    }, [assignmentId, classroomId, challenges]);
+
+    const originalIds = useMemo(() => {
+        return new Set(challenges.map((c) => c.id));
+    }, [challenges]);
+
+    const added = useMemo(() => {
+        return draft.filter((c) => !originalIds.has(c.id));
+    }, [draft, originalIds]);
 
     const resetAll = () => {
-        setDraft(challenges.map(c => ({ ...c })));
-        setAdded([]);
+        setDraft(challenges.map((c) => ({ ...c })));
     };
 
     const addSelected = (selected: Challenge[]) => {
-        setDraft(prev => [...prev, ...selected]);
-        setAdded(prev => [...prev, ...selected]);
+        setDraft((prev) => {
+            const existingIds = new Set(prev.map((c) => c.id));
+            const newOnes = selected.filter((c) => !existingIds.has(c.id));
+            return [...prev, ...newOnes];
+        });
     };
 
     const save = async () => {
         if (!assignmentId || !classroomId || added.length === 0) return;
 
-        const ids = added.map(c => c.id);
+        const ids = added.map((c) => c.id);
 
-        await addMutation.mutateAsync({ classroomId, assignmentId, challengeIds: ids });
-
-        setAdded([]);
+        await addMutation.mutateAsync({
+            classroomId,
+            assignmentId,
+            challengeIds: ids,
+        });
     };
 
     const cancel = () => {
-        setDraft(prev => prev.filter(c => !added.includes(c)));
-        setAdded([]);
+        setDraft(challenges.map((c) => ({ ...c })));
     };
 
     return {

@@ -25,6 +25,7 @@ import { ContextMenu } from "@/shared/components/context-menu/ContextMenu";
 import { useAssignmentContextMenu } from "@/features/assignment/hooks/useAssignmentContextMenu";
 import ListSkeleton from "@/shared/components/loading-skeleton/ListSkeleton";
 import type { Classroom } from "../apis/classroom.api";
+import { useClassroomRole } from "../hooks/useClassroomRole";
 
 type DialogKey = "edit" | "create" | "delete" | "leave";
 
@@ -35,6 +36,8 @@ interface MainBarClassroomProp {
 const MainBarClassroom = ({ classroom }:MainBarClassroomProp) => {
   const navigate = useGuardedNavigate();
   const { classroomId, assignmentId } = useClassroomRoute();
+  const { data: roleData } = useClassroomRole(classroomId);
+  
 
   // Queries
   const { data: assignments = [], isLoading } = useAssignmentClassrooms(classroomId);
@@ -57,7 +60,7 @@ const MainBarClassroom = ({ classroom }:MainBarClassroomProp) => {
     leave: false,
   });
 
-  const isStudent = classroom?.role === "STUDENT";
+  const isStudent = roleData?.role === "STUDENT";
   const totalStudents = members.filter((m) => m.role === "STUDENT").length;
   const [activeTab, setActiveTab] = useState<string>(isStudent ? "Upcoming" : "All");
 
@@ -74,12 +77,14 @@ const MainBarClassroom = ({ classroom }:MainBarClassroomProp) => {
     ];
 
   const filteredAssignments = useMemo(() => {
+
     return assignments.filter((a) => {
+      console.log("assignmentId ", a.id ,"assignmenttitle", a.title ,"submmission status: ", a.submissionStatus)
       if (isStudent) {
-        const isPast = new Date(a.dueAt) < new Date();
+        const isPast = new Date(a.dueAt) < new Date() && a.submissionStatus !== "NOT SUBMITTED";
         if (activeTab === "Upcoming") return !isPast;
         if (activeTab === "Past Due") return isPast;
-        if (activeTab === "Completed") return false; // TODO
+        if (activeTab === "Completed") return a.submissionStatus !== "NOT SUBMITTED";
         return true;
       }
 
@@ -189,6 +194,7 @@ const MainBarClassroom = ({ classroom }:MainBarClassroomProp) => {
               <AssignmentCard
                 key={a.id}
                 assignment={a}
+                isStudent={isStudent}
                 isSelect={a.id === assignmentId}
                 onClick={() =>
                   navigate(`/classrooms/${classroomId}/assignments/${a.id}`)

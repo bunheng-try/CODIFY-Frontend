@@ -19,7 +19,7 @@ function ChallengeWorkspace() {
   // Fetch assignment
   const assignmentQuery = useAssignment(Number(classroomId), Number(assignmentId));
   const assignment = assignmentQuery.data;
-  const challenges = assignment?.assignmentChallenges ?? [];
+  const challenges = assignment?.codingChallenges ?? [];
 
   // Zustand store
   const currentChallengeId = useWorkspaceStore((s) => s.currentChallengeId);

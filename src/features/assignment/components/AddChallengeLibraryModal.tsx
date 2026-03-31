@@ -7,7 +7,7 @@ import { ChallengeCard } from "@/features/challenge/components/ChallengeCard";
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  onCreateNew: () => void;
+  onCreateNew?: () => void;
   onAddSelected: (challenges: Challenge[]) => void;
   libraryChallenges: Challenge[];
 }

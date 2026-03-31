@@ -10,7 +10,7 @@ export const useAssignmentEditorDirty = (classroomId: number | null, assignmentI
 
     useEffect(() => {
         if (assignment) setDraft({ ...assignment });
-    }, [assignment]);
+    }, [assignment, assignmentId, classroomId]);
 
 
     const updateField = <K extends keyof Assignment>(key: K, value: Assignment[K]) => {
