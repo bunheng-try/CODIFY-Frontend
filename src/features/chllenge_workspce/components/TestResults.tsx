@@ -1,6 +1,7 @@
 import TestCase from "./TestCases"
 import Loading from "@/shared/components/loading/Loading"
 import { StatusPanel } from "@/shared/components/empty_state/StatusPanel"
+import type { TestCaseResult } from "../apis/code-runner.api"
 
 interface ResultType {
     input: string
@@ -11,7 +12,7 @@ interface ResultType {
 }
 
 interface TestResultsProps {
-    results: ResultType[],
+    results: TestCaseResult[],
     isError: boolean,
     isRunning: boolean,
 }

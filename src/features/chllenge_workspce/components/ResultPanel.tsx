@@ -11,6 +11,7 @@ import { useWorkspaceStore } from "../stores/useWorkspaceStore"
 import { useRunTestCode, useRunCode, useJobStatus } from "../hooks/useCodeRunnerQuery"
 import type { AssignmentChallenge } from "@/features/assignment/apis/assignment.api"
 import { LoadingButton } from "@/shared/components/ui/loadingButton"
+import type { CustomCodeResult, TestCaseResult } from "../apis/code-runner.api"
 
 type Tab = "tests" | "custom"
 export type RunState = "loading" | "idle";
@@ -19,73 +20,78 @@ export default function ResultPanel({ currentChallenge }: { currentChallenge: As
     const [activeTab, setActiveTab] = useState<Tab>("tests")
     const [collapsed, setCollapsed] = useState(false)
     const [jobId, setJobId] = useState<string | null>(null)
-    const [results, setResults] = useState<any[]>([])
+    const [runState, setRunState] = useState<RunState>("idle")
+    const [jobType, setJobType] = useState<Tab | null>(null)
+
+    const [testResults, setTestResults] = useState<TestCaseResult[]>([])
+    const [customResult, setCustomResult] = useState<CustomCodeResult | null>(null)
 
     const code = useWorkspaceStore((s) => s.codes[currentChallenge.id] ?? "")
 
     const runTestCodeMutation = useRunTestCode()
     const runCodeMutation = useRunCode()
     const jobQuery = useJobStatus(jobId)
-    const [runState, setRunState] = useState<RunState>("idle");
 
     const handleRun = async () => {
-        let challengeId = currentChallenge.originalChallenge_id;
-        let language = currentChallenge.language;
+        const challengeId = currentChallenge.originalChallenge_id
+        const language = currentChallenge.language
 
-        
         if (activeTab === "tests") {
-            const res = await runTestCodeMutation.mutateAsync({
-                challengeId,
-                language,
-                code,
-            })
+            const res = await runTestCodeMutation.mutateAsync({ challengeId, language, code })
             setJobId(res.jobId)
+            setJobType("tests")
+            setTestResults([])
         } else if (activeTab === "custom") {
-            const res = await runCodeMutation.mutateAsync({
-                language,
-                code,
-            })
+            const res = await runCodeMutation.mutateAsync({ language, code })
             setJobId(res.jobId)
+            setJobType("custom")
+            setCustomResult(null)
         }
 
-        setRunState("loading");
+        setRunState("loading")
     }
-    
-    useEffect(() => {
-        if (jobQuery.data?.state === "completed" && jobQuery.data.result?.results) {
-            const newResults = jobQuery.data.result.results.map((tc: any, index: number) => ({
-                input: tc.input ?? `Test case ${index + 1}`,
-                expected: tc.expectedOutput,
-                output: tc.actualOutput,
-                passed: tc.passed,
-                isHidden: tc.isHidden,
-            }));
 
-            setResults(newResults);
+    useEffect(() => {
+        if (!jobQuery.data || !jobType) return
+
+        if (jobQuery.data.state === "completed") {
+            if (jobType === "tests" && 'results' in jobQuery.data.result!) {
+                setTestResults(jobQuery.data.result.results)
+            } else if (jobType === "custom" && !('results' in jobQuery.data.result!)) {
+                setCustomResult({
+                    stdout: jobQuery.data.result?.stdout ?? "",
+                    status: jobQuery.data.result?.status ?? "unknown"
+                })
+            }
+
+            setRunState("idle")
         }
 
-        if (jobQuery.data?.state === "completed") setRunState("idle")
-    }, [jobQuery.data]);
-    
+        if (jobQuery.data.state === "failed") {
+            setRunState("idle")
+            if (jobType === "custom") {
+                setCustomResult({
+                    stdout: "",
+                    status: "failed"
+                })
+            }
+        }
+    }, [jobQuery.data, jobType])
+
     const isRunning = runState === "loading"
-    const isError = jobQuery.data?.state === "failed";
+    const isError = jobQuery.data?.state === "failed"
 
     const tabs: TabItem<Tab>[] = [
         { key: "tests", label: "Tests Result" },
         { key: "custom", label: "Custom" }
     ]
 
-
     return (
         <Panel className="transition-all duration-300">
             <PanelHeader
                 topLeft={
                     <div className="flex items-center gap-2">
-                        <Button
-                            size="icon-sm"
-                            variant="ghost"
-                            onClick={() => setCollapsed(!collapsed)}
-                        >
+                        <Button size="icon-sm" variant="ghost" onClick={() => setCollapsed(!collapsed)}>
                             <WrapIcon icon={collapsed ? ChevronLeft : ChevronRight} />
                         </Button>
                         <span className="text-sm font-medium">Results</span>
@@ -94,7 +100,7 @@ export default function ResultPanel({ currentChallenge }: { currentChallenge: As
                 topRight={
                     <LoadingButton
                         size="sm"
-                        spinnerSize={"sm"}
+                        spinnerSize="sm"
                         variant="outline"
                         isLoading={isRunning}
                         loadingText="Running…"
@@ -104,13 +110,13 @@ export default function ResultPanel({ currentChallenge }: { currentChallenge: As
                         <WrapIcon icon={Play} /> Run
                     </LoadingButton>
                 }
-                tabs={
-                    <MenuTabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
-                }
+                tabs={<MenuTabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />}
             />
             <PanelContent>
-                {activeTab === "tests" && <TestResults results={results} isError={isError} isRunning={isRunning} />}
-                {/* {activeTab === "custom" && <CustomRunner jobId={jobId} />} */}
+                {activeTab === "tests" && (
+                    <TestResults results={testResults} isError={isError} isRunning={isRunning} />
+                )}
+                {activeTab === "custom" && <CustomRunner result={customResult} isRunning={isRunning} isError={isError} />}
             </PanelContent>
         </Panel>
     )

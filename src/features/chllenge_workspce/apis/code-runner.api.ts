@@ -14,6 +14,10 @@ export interface TestCaseResult {
     status: "ACCEPTED" | "ERROR" | "FAILED";
     actualOutput: string;
     expectedOutput: string;
+    input: string
+    expected: string
+    output?: string
+    isHidden?: boolean
 }
 
 // Job result for test code (array of test case results)
@@ -21,13 +25,20 @@ export interface TestCodeResult {
     results: TestCaseResult[];
 }
 
+export interface CustomCodeResult {
+    stdout?: string;
+    status?: string; // e.g., "success" or "failed"
+}
+
+export type JobResult = TestCodeResult | CustomCodeResult;
+
 export type JobState = "queue" | "completed" | "failed";
 
 // Job status response
 export interface JobStatusResponse {
     jobId: string;
     state: JobState;
-    result?: TestCodeResult; // fixed to handle multiple test cases
+    result?: JobResult; // fixed to handle multiple test cases
 }
 
 // DTOs for running code
