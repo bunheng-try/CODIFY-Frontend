@@ -16,16 +16,13 @@ import ResultPanel from "../components/ResultPanel";
 function ChallengeWorkspace() {
   const { classroomId, assignmentId } = useParams();
 
-  // Fetch assignment
   const assignmentQuery = useAssignment(Number(classroomId), Number(assignmentId));
   const assignment = assignmentQuery.data;
   const challenges = assignment?.codingChallenges ?? [];
 
-  // Zustand store
   const currentChallengeId = useWorkspaceStore((s) => s.currentChallengeId);
   const setCurrentChallenge = useWorkspaceStore((s) => s.setCurrentChallenge);
   const setStarterCode = useWorkspaceStore((s) => s.setStarterCode);
-  const starterCode = useWorkspaceStore((s) => s.starterCodes);
 
   useEffect(() => {
     if (!assignmentQuery.isSuccess || !assignment || challenges.length === 0) return;
@@ -41,11 +38,10 @@ function ChallengeWorkspace() {
   const currentChallenge = challenges.find((c) => c.id === currentChallengeId) ?? null;
 
   useEffect(() => {
-    if (!currentChallenge?.starterCode) return;
-    setStarterCode(currentChallenge.id, currentChallenge.starterCode);
-    console.log(`challenge has changed!!!!!!!!!!!!!!!!!!!! ${starterCode[currentChallengeId!]}`)
+    if (!currentChallenge?.startCode) return;
+    setStarterCode(currentChallenge.id, currentChallenge.startCode);
   }, [currentChallenge, setStarterCode]);
-
+  
   if (assignmentQuery.isLoading) return <div>Loading assignment...</div>;
   if (!currentChallenge) return <div>No challenge selected</div>;
 
